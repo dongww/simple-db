@@ -1,0 +1,20 @@
+{
+    "name": "dongww/simple-db",
+    "type": "library",
+    "license": "MIT",
+    "description": "数据库封装。",
+    "require": {
+        "doctrine/dbal": "~2.4",
+        "symfony/console": "~2.4",
+        "symfony/yaml": "~2.4",
+        "symfony/config": "~2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    },
+    "bin": [
+        "bin/console"
+    ]
+}
