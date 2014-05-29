@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\Dbal\Core;
 
-
 class Bean
 {
     protected $data = [];

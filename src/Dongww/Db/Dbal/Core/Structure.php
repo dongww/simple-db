@@ -53,6 +53,7 @@ class Structure
     {
         $yaml = new Parser();
         $data = $yaml->parse(file_get_contents($fileName));
+
         return new self($data);
     }
 

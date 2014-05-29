@@ -52,6 +52,7 @@ class ManagerFactory
         if (!isset(self::$managers[$name])) {
             self::$managers[$name] = new Manager($this, $this->conn, $name);
         }
+
         return self::$managers[$name];
     }
 }
