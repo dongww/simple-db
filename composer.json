@@ -16,6 +16,6 @@
         }
     },
     "bin": [
-        "bin/console"
+        "bin/simpledb"
     ]
 }
