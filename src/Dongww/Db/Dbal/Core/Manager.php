@@ -7,42 +7,31 @@
 
 namespace Dongww\Db\Dbal\Core;
 
-use Doctrine\DBAL\Connection;
 use Dongww\Db\Dbal\ManagerFactory;
 
 class Manager
 {
     protected $tableName = null;
 
-    protected $structure;
-    /** @var \Doctrine\DBAL\Connection */
-    protected $conn;
     /** @var  ManagerFactory */
     protected $mf;
 
     /**
      * @return \Doctrine\DBAL\Connection
      */
-    public function getConn()
+    public function getConnection()
     {
-        return $this->conn;
+        return $this->mf->getConnection();
     }
 
-    public function __construct(ManagerFactory $mf, Connection $conn, $tableName, array $structure)
+    public function __construct(ManagerFactory $mf, $tableName)
     {
-        $this->setStructure($structure);
         $this->setTableName($tableName);
-        $this->conn = $conn;
-        $this->mf   = $mf;
+        $this->mf = $mf;
 
         if (!$this->tableName) {
             throw new \Exception('未定义表名');
         }
-    }
-
-    protected function setStructure(array $structure)
-    {
-        $this->structure = $structure;
     }
 
     protected function setTableName($name)
@@ -69,7 +58,7 @@ class Manager
             throw new \Exception('ID必须大于0！');
         }
 
-        $qb = $this->conn->createQueryBuilder();
+        $qb = $this->getConnection()->createQueryBuilder();
         $qb
             ->select($this->tableName . '.*')
             ->from($this->tableName, $this->tableName)
@@ -77,12 +66,58 @@ class Manager
             ->setMaxResults(1)
             ->setParameter(0, $id);
 
-        $stmt = $this->conn->executeQuery($qb->getSQL(), $qb->getParameters());
+        $stmt = $this->getConnection()->executeQuery($qb->getSQL(), $qb->getParameters());
 
-        $bean = new Bean();
-        $bean->setManager($this);
+        $bean = new Bean($this);
         $bean->import($stmt->fetch());
 
         return $bean;
+    }
+
+    /**
+     * 创建一个没有数据的 Bean
+     *
+     * @return Bean
+     */
+    public function createBean()
+    {
+        return new Bean($this);
+    }
+
+    /**
+     * 保存一个 Bean
+     *
+     * @param Bean $bean
+     */
+    public function store(Bean $bean)
+    {
+
+    }
+
+    public function cleanData($type, $oldValue)
+    {
+        $value = null;
+        switch ($type) {
+            case Structure::TYPE_DATE:
+            case Structure::TYPE_DATETIME:
+            case Structure::TYPE_TIME:
+                $value = new \DateTime($oldValue);
+                break;
+            case Structure::TYPE_INTEGER:
+                $value = (int)trim($oldValue);
+                break;
+            case Structure::TYPE_FLOAT:
+                $value = (float)trim($oldValue);
+                break;
+            case Structure::TYPE_BOOLEAN:
+                $value = (bool)$oldValue;
+                break;
+            case Structure::TYPE_STRING:
+            case Structure::TYPE_TEXT:
+            default:
+                $value = (string)$oldValue;
+        }
+
+        return $value;
     }
 }

@@ -16,6 +16,11 @@ class Bean
     /** @var  Manager */
     protected $manager;
 
+    public function __construct(Manager $manager)
+    {
+        $this->setManager($manager);
+    }
+
     public function getTableName()
     {
         return $this->manager->getTableName();
@@ -29,7 +34,7 @@ class Bean
         return $this->manager;
     }
 
-    public function setManager(Manager $manager)
+    protected function setManager(Manager $manager)
     {
         $this->manager = $manager;
     }
@@ -60,6 +65,12 @@ class Bean
         $this->data = $data;
     }
 
+    /**
+     * 获得 Parent Bean
+     *
+     * @param $name
+     * @return Bean|null
+     */
     public function getParent($name)
     {
         $parent_id = $name . '_id';
@@ -67,9 +78,7 @@ class Bean
             return null;
         }
 
-        $m = $this
-            ->getManagerFactory()
-            ->createManager($name);
+        $m = $this->getManagerFactory()->getManager($name);
 
         return $m->get($this->data[$parent_id]);
     }

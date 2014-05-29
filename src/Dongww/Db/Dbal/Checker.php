@@ -11,21 +11,11 @@ namespace Dongww\Db\Dbal;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Symfony\Component\Yaml\Parser;
+use Dongww\Db\Dbal\Core\Structure;
 
 class Checker
 {
     protected $conn;
-
-    protected static $DATA_TYPE_MAP = [
-        'string'   => 'string',
-        'text'     => 'text',
-        'integer'  => 'integer',
-        'float'    => 'float',
-        'datetime' => 'datetime',
-        'date'     => 'date',
-        'time'     => 'time',
-    ];
 
     public function __construct(Connection $conn)
     {
@@ -40,9 +30,10 @@ class Checker
      */
     public function getDiffSql($fileName)
     {
-        $yaml   = new Parser();
-        $data   = $yaml->parse(file_get_contents($fileName));
-        $tables = [];
+        $structure    = Structure::createFromYaml($fileName);
+        $data         = $structure->getStructure();
+        $structureMap = Structure::getTypeMap();
+        $tables       = [];
 
         $newSchema = new Schema();
         foreach ($data['tables'] as $tblName => $tbl) {
@@ -53,8 +44,8 @@ class Checker
                 $options            = [];
                 $options['notnull'] = isset($field['required']) ? (bool)$field['required'] : false;
 
-                if (isset(self::$DATA_TYPE_MAP[$field['type']])) {
-                    $newTable->addColumn($fieldName, self::$DATA_TYPE_MAP[$field['type']], $options);
+                if (isset($structureMap[$field['type']])) {
+                    $newTable->addColumn($fieldName, $structureMap[$field['type']], $options);
                 }
             }
 
