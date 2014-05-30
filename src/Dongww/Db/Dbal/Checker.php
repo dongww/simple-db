@@ -37,7 +37,7 @@ class Checker
 
         $newSchema = new Schema();
 
-        if (isset($data['tables'])) {
+        if (is_array($data['tables'])) {
             foreach ($data['tables'] as $tblName => $tbl) {
                 /** @var \Doctrine\DBAL\Schema\Table $newTable */
                 $newTable = $tables[$tblName] = $newSchema->createTable($tblName);
@@ -81,7 +81,7 @@ class Checker
 
 
         /** 多对一 */
-        if (isset($data['tables'])) {
+        if (is_array($data['tables'])) {
             foreach ($data['tables'] as $tblName => $tbl) {
                 if (isset($tbl['parents'])) {
                     foreach ($tbl['parents'] as $p) {
