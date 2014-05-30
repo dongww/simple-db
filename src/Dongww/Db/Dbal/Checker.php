@@ -36,51 +36,57 @@ class Checker
         $tables       = [];
 
         $newSchema = new Schema();
-        foreach ($data['tables'] as $tblName => $tbl) {
-            /** @var \Doctrine\DBAL\Schema\Table $newTable */
-            $newTable = $tables[$tblName] = $newSchema->createTable($tblName);
 
-            foreach ($tbl['fields'] as $fieldName => $field) {
-                $options            = [];
-                $options['notnull'] = isset($field['required']) ? (bool)$field['required'] : false;
+        if (isset($data['tables'])) {
+            foreach ($data['tables'] as $tblName => $tbl) {
+                /** @var \Doctrine\DBAL\Schema\Table $newTable */
+                $newTable = $tables[$tblName] = $newSchema->createTable($tblName);
 
-                if (isset($structureMap[$field['type']])) {
-                    $newTable->addColumn($fieldName, $structureMap[$field['type']], $options);
+                foreach ($tbl['fields'] as $fieldName => $field) {
+                    $options            = [];
+                    $options['notnull'] = isset($field['required']) ? (bool)$field['required'] : false;
+
+                    if (isset($structureMap[$field['type']])) {
+                        $newTable->addColumn($fieldName, $structureMap[$field['type']], $options);
+                    }
                 }
-            }
 
-            $newTable->addColumn("id", "integer", array('autoincrement' => true));
-            $newTable->setPrimaryKey(array("id"));
+                $newTable->addColumn("id", "integer", array('autoincrement' => true));
+                $newTable->setPrimaryKey(array("id"));
 
-            /** timestamp_able 创建时间，更改时间 */
-            $timeAble = isset($tbl['timestamp_able']) ? $tbl['timestamp_able'] : false;
-            if ($timeAble) {
-                $newTable->addColumn('created_at', "datetime");
-                $newTable->addColumn('updated_at', "datetime");
-            }
+                /** timestamp_able 创建时间，更改时间 */
+                $timeAble = isset($tbl['timestamp_able']) ? $tbl['timestamp_able'] : false;
+                if ($timeAble) {
+                    $newTable->addColumn('created_at', "datetime");
+                    $newTable->addColumn('updated_at', "datetime");
+                }
 
-            /** tree_able 可进行树状存储 */
-            $treeAble = isset($tbl['tree_able']) ? $tbl['tree_able'] : false;
-            if ($treeAble) {
-                $newTable->addColumn("sort", "integer", ['notnull' => false]);
-                $newTable->addColumn("path", "string", ['notnull' => false]);
-                $newTable->addColumn("level", "integer", ['notnull' => false]);
+                /** tree_able 可进行树状存储 */
+                $treeAble = isset($tbl['tree_able']) ? $tbl['tree_able'] : false;
+                if ($treeAble) {
+                    $newTable->addColumn("sort", "integer", ['notnull' => false]);
+                    $newTable->addColumn("path", "string", ['notnull' => false]);
+                    $newTable->addColumn("level", "integer", ['notnull' => false]);
 
-                $newTable->addColumn("parent_id", "integer", ['notnull' => false]);
-                $newTable->addForeignKeyConstraint(
-                    $newTable,
-                    array('parent_id'),
-                    array("id"),
-                    array("onUpdate" => "CASCADE")
-                );
+                    $newTable->addColumn("parent_id", "integer", ['notnull' => false]);
+                    $newTable->addForeignKeyConstraint(
+                        $newTable,
+                        array('parent_id'),
+                        array("id"),
+                        array("onUpdate" => "CASCADE")
+                    );
+                }
             }
         }
 
+
         /** 多对一 */
-        foreach ($data['tables'] as $tblName => $tbl) {
-            if (isset($tbl['parents'])) {
-                foreach ($tbl['parents'] as $p) {
-                    $this->addForeign($tables[$tblName], $tables[$p]);
+        if (isset($data['tables'])) {
+            foreach ($data['tables'] as $tblName => $tbl) {
+                if (isset($tbl['parents'])) {
+                    foreach ($tbl['parents'] as $p) {
+                        $this->addForeign($tables[$tblName], $tables[$p]);
+                    }
                 }
             }
         }

@@ -41,7 +41,7 @@ class Structure
 
     public function __construct(array $structure)
     {
-        $this->structure = $structure;
+        $this->data = $structure;
     }
 
     public static function getTypeMap()
