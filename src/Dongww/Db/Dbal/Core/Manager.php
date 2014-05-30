@@ -8,6 +8,7 @@
 namespace Dongww\Db\Dbal\Core;
 
 use Dongww\Db\Dbal\ManagerFactory;
+use Doctrine\DBAL\Types\Type;
 
 class Manager
 {
@@ -91,7 +92,44 @@ class Manager
      */
     public function store(Bean $bean)
     {
+        if ($bean->id) {
 
+        } else {
+            $tblStructure = $this
+                ->getManagerFactory()
+                ->getStructure()
+                ->getTableStructure($this->getTableName());
+            $data         = [];
+            $types        = [];
+
+            if (is_array($tblStructure['fields'])) {
+                foreach ($tblStructure['fields'] as $name => $field) {
+                    $data['`' . $name . '`'] = $bean->$name;
+                    $types[]                 = Type::getType($field['type']);
+                }
+            }
+
+            if (is_array($tblStructure['parents'])) {
+                foreach ($tblStructure['parents'] as $name) {
+                    $fid        = $name . '_id';
+                    $data[$fid] = $bean->get($fid);
+                    $types[]    = Type::getType('integer');
+                }
+            }
+
+            if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
+                $data['created_at'] = new \DateTime();
+                $data['updated_at'] = new \DateTime();
+                $types[]            = Type::getType('datetime');
+                $types[]            = Type::getType('datetime');
+            }
+
+            $this->getConnection()->insert(
+                $this->getTableName(),
+                $data,
+                $types
+            );
+        }
     }
 
     public function cleanData($type, $oldValue)

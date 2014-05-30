@@ -47,10 +47,15 @@ class ManagerFactory
         $this->structure = $structure;
     }
 
+    public function getStructure()
+    {
+        return $this->structure;
+    }
+
     public function getManager($name)
     {
         if (!isset(self::$managers[$name])) {
-            self::$managers[$name] = new Manager($this, $this->conn, $name);
+            self::$managers[$name] = new Manager($this, $name);
         }
 
         return self::$managers[$name];

@@ -50,13 +50,18 @@ class Bean
 
     public function __get($name)
     {
-        return isset($this->data[$name]) ? $this->data[$name] : null;
+        return $this->get($name);
     }
 
     public function __isset($name)
     {
 //        return isset($this->data[$name]) ? true : false;
         return true;
+    }
+
+    public function get($name)
+    {
+        return isset($this->data[$name]) ? $this->data[$name] : null;
     }
 
     public function import(array $data)
