@@ -110,7 +110,7 @@ class Checker
     public function addForeign(Table $table, Table $foreignTable)
     {
         $columnName = $foreignTable->getName() . '_id';
-        $table->addColumn($columnName, "integer");
+        $table->addColumn($columnName, "integer", ['notnull' => false]);
         $table->addForeignKeyConstraint(
             $foreignTable,
             array($columnName),
