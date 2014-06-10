@@ -30,10 +30,13 @@ $mf   = new ManagerFactory($conn, $structure);
 //);
 
 $gm                = $mf->getManager('goods');
-$bean              = $gm->createBean();
-$bean->category_id = 1;
-$bean->name        = 'asdf'; //echo $bean->name;exit;
-//$bean->created_at  = new \DateTime();
-//$bean->updated_at  = new \DateTime();
+//$bean              = $gm->createBean();
+//$bean->category_id = 1;
+//$bean->name        = 'asdf'; //echo $bean->name;exit;
 //print_r($bean);exit;
+//$gm->store($bean);
+
+$bean = $gm->get(12);
+$bean->name = 'aa';
 $gm->store($bean);
+//$gm->remove($bean);

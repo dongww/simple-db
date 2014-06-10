@@ -77,13 +77,13 @@ class Bean
      */
     public function getParent($name)
     {
-        $parent_id = $name . '_id';
-        if (!isset($this->data[$parent_id])) {
+        $parentId = Manager::foreignKey($name);
+        if (!isset($this->data[$parentId])) {
             return null;
         }
 
         $m = $this->getManagerFactory()->getManager($name);
 
-        return $m->get($this->data[$parent_id]);
+        return $m->get($this->data[$parentId]);
     }
 }

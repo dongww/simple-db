@@ -41,7 +41,9 @@ class Manager
     }
 
     /**
-     * @return null
+     * 获取表名
+     *
+     * @return string
      */
     public function getTableName()
     {
@@ -53,6 +55,13 @@ class Manager
         return $this->mf;
     }
 
+    /**
+     * 根据一个Id获取一个Bean
+     *
+     * @param $id
+     * @return Bean
+     * @throws \Exception
+     */
     public function get($id)
     {
         if ((int)$id < 1) {
@@ -61,16 +70,17 @@ class Manager
 
         $qb = $this->getConnection()->createQueryBuilder();
         $qb
-            ->select($this->tableName . '.*')
-            ->from($this->tableName, $this->tableName)
-            ->where($this->tableName . '.id = ?')
+            ->select($this->allFields())
+            ->from($this->tableName, $this->aliases())
+            ->where($this->idField() . ' = ?')
             ->setMaxResults(1)
             ->setParameter(0, $id);
 
         $stmt = $this->getConnection()->executeQuery($qb->getSQL(), $qb->getParameters());
 
         $bean = new Bean($this);
-        $bean->import($stmt->fetch());
+        $data = $stmt->fetch();
+        $bean->import($data ? $data : []);
 
         return $bean;
     }
@@ -89,34 +99,46 @@ class Manager
      * 保存一个 Bean
      *
      * @param Bean $bean
+     * @return int
      */
     public function store(Bean $bean)
     {
+        $tblStructure = $this
+            ->getManagerFactory()
+            ->getStructure()
+            ->getTableStructure($this->getTableName());
+        $data         = [];
+        $types        = [];
+
+        if (is_array($tblStructure['fields'])) {
+            foreach ($tblStructure['fields'] as $name => $field) {
+                $quotedName        = $this->getConnection()->quoteIdentifier($name);
+                $data[$quotedName] = $bean->$name;
+                $types[]           = Type::getType($field['type']);
+            }
+        }
+
+        if (is_array($tblStructure['parents'])) {
+            foreach ($tblStructure['parents'] as $name) {
+                $fid        = self::foreignKey($name);
+                $data[$fid] = $bean->get($fid);
+                $types[]    = Type::getType('integer');
+            }
+        }
+
         if ($bean->id) {
+            if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
+                $data['updated_at'] = new \DateTime();
+                $types[]            = Type::getType('datetime');
+            }
 
+            return $this->getConnection()->update(
+                $this->getTableName(),
+                $data,
+                ['id' => $bean->id],
+                $types
+            );
         } else {
-            $tblStructure = $this
-                ->getManagerFactory()
-                ->getStructure()
-                ->getTableStructure($this->getTableName());
-            $data         = [];
-            $types        = [];
-
-            if (is_array($tblStructure['fields'])) {
-                foreach ($tblStructure['fields'] as $name => $field) {
-                    $data['`' . $name . '`'] = $bean->$name;
-                    $types[]                 = Type::getType($field['type']);
-                }
-            }
-
-            if (is_array($tblStructure['parents'])) {
-                foreach ($tblStructure['parents'] as $name) {
-                    $fid        = $name . '_id';
-                    $data[$fid] = $bean->get($fid);
-                    $types[]    = Type::getType('integer');
-                }
-            }
-
             if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
                 $data['created_at'] = new \DateTime();
                 $data['updated_at'] = new \DateTime();
@@ -124,12 +146,31 @@ class Manager
                 $types[]            = Type::getType('datetime');
             }
 
-            $this->getConnection()->insert(
+            return $this->getConnection()->insert(
                 $this->getTableName(),
                 $data,
                 $types
             );
         }
+    }
+
+    /**
+     * 从数据库删除指定Bean相对应的数据行
+     *
+     * @param Bean $bean
+     * @return int
+     */
+    public function remove(Bean $bean)
+    {
+        return $this->getConnection()->delete(
+            $this->tableName,
+            ['id' => $bean->id]
+        );
+    }
+
+    public function findAll()
+    {
+        //TODO
     }
 
     public function cleanData($type, $oldValue)
@@ -157,5 +198,37 @@ class Manager
         }
 
         return $value;
+    }
+
+    public function allFields($tableName = null)
+    {
+        if ($tableName == null) {
+            $tableName = $this->tableName;
+        }
+
+        return $tableName . '.*';
+    }
+
+    public function aliases($tableName = null)
+    {
+        if ($tableName == null) {
+            $tableName = $this->tableName;
+        }
+
+        return $tableName;
+    }
+
+    public function idField($tableName = null)
+    {
+        if ($tableName == null) {
+            $tableName = $this->tableName;
+        }
+
+        return $tableName . '.id';
+    }
+
+    public static function foreignKey($foreignTable)
+    {
+        return $foreignTable . '_id';
     }
 }

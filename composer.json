@@ -5,10 +5,11 @@
     "description": "数据库封装。",
     "require": {
         "php": ">=5.4",
-        "doctrine/dbal": "~2.4",
+        "doctrine/orm": "~2.4",
         "symfony/console": "~2.4",
         "symfony/yaml": "~2.4",
-        "symfony/config": "~2.4"
+        "symfony/config": "~2.4",
+        "catfan/medoo": "*"
     },
     "autoload": {
         "psr-4": {
