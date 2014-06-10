@@ -14,7 +14,8 @@
     "autoload": {
         "psr-4": {
             "": "src/"
-        }
+        },
+        "files": ["src/Dongww/Db/RedBean/rb.phar"]
     },
     "bin": [
         "bin/simpledb"

@@ -16,6 +16,7 @@ class MedooProvider implements ServiceProviderInterface
             return new \medoo([
                 'database_type' => substr($app['db.options']['driver'], 4),
                 'database_name' => $app['db.options']['dbname'],
+                'database_file' => $app['db.options']['path'],
                 'server'        => $app['db.options']['host'],
                 'username'      => $app['db.options']['user'],
                 'password'      => $app['db.options']['password'],
