@@ -10,6 +10,7 @@ namespace Dongww\Db\Dbal;
 use Doctrine\DBAL\Connection;
 use Dongww\Db\Dbal\Core\Manager;
 use Dongww\Db\Dbal\Core\Structure;
+use Doctrine\DBAL\Logging\DebugStack;
 
 class ManagerFactory
 {
@@ -20,8 +21,14 @@ class ManagerFactory
     /** @var Core\Manager[] */
     protected static $managers = [];
 
-    public function __construct($conn, Structure $structure)
+    protected $debug;
+
+    /** @var DebugStack */
+    protected $logger;
+
+    public function __construct($conn, Structure $structure, $debug = false)
     {
+        $this->debug = (bool)$debug;
         $this->setConnection($conn);
         $this->setStructure($structure);
     }
@@ -29,6 +36,11 @@ class ManagerFactory
     public function setConnection(Connection $conn)
     {
         $this->conn = $conn;
+
+        if ($this->debug) {
+            $this->logger = new DebugStack();
+            $this->conn->getConfiguration()->setSQLLogger($this->logger);
+        }
     }
 
     /**
@@ -59,5 +71,14 @@ class ManagerFactory
         }
 
         return self::$managers[$name];
+    }
+
+    public function getSqlStack($simple = true)
+    {
+        if (!$this->debug) {
+            return null;
+        }
+
+        return $this->logger->queries;
     }
 }
