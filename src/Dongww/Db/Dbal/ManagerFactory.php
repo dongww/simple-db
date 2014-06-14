@@ -14,6 +14,7 @@ use Doctrine\DBAL\Logging\DebugStack;
 
 class ManagerFactory
 {
+    /** @var  Connection */
     protected $conn;
     /** @var  Structure */
     protected $structure;
@@ -44,7 +45,7 @@ class ManagerFactory
     }
 
     /**
-     * @return mixed
+     * @return Connection
      */
     public function getConnection()
     {
