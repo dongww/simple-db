@@ -13,7 +13,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     protected $category;
     protected $name;
 
-    protected $fields = [
+    protected static $fields = [
         [
             'name'    => 'title',
             'type'    => 'string',
@@ -34,7 +34,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
             'type' => 'integer',
         ],
     ];
-    protected $many2one;
+    protected static $many2one;
 
     public function __construct()
     {
@@ -42,7 +42,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
 
         static::$parentId = static::$tableName . '_id';
 
-        $this->many2one = [
+        static::$many2one = [
             static::$tableName,
         ];
 

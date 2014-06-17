@@ -9,7 +9,7 @@ namespace Dongww\Db\RedBean;
 
 abstract class SimpleCategoryManagerAbstract extends ManagerAbstract
 {
-    protected $fields = [
+    protected static $fields = [
         [
             'name'    => 'name',
             'type'    => 'string',
