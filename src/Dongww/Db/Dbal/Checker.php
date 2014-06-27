@@ -12,6 +12,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Dongww\Db\Dbal\Core\Structure;
+use Dongww\Db\Dbal\Behavior;
 
 class Checker
 {
@@ -57,28 +58,16 @@ class Checker
                 /** timestamp_able 创建时间，更改时间 */
                 $timeAble = isset($tbl['timestamp_able']) ? $tbl['timestamp_able'] : false;
                 if ($timeAble) {
-                    $newTable->addColumn('created_at', "datetime");
-                    $newTable->addColumn('updated_at', "datetime");
+                    (new Behavior\TimestampBehavior())->doIt($newTable);
                 }
 
                 /** tree_able 可进行树状存储 */
                 $treeAble = isset($tbl['tree_able']) ? $tbl['tree_able'] : false;
                 if ($treeAble) {
-                    $newTable->addColumn("sort", "integer", ['notnull' => false]);
-                    $newTable->addColumn("path", "string", ['notnull' => false]);
-                    $newTable->addColumn("level", "integer", ['notnull' => false]);
-
-                    $newTable->addColumn("parent_id", "integer", ['notnull' => false]);
-                    $newTable->addForeignKeyConstraint(
-                        $newTable,
-                        array('parent_id'),
-                        array("id"),
-                        array("onUpdate" => "CASCADE")
-                    );
+                    (new Behavior\TreeBehavior())->doIt($newTable);
                 }
             }
         }
-
 
         /** 多对一 */
         if (is_array($data['tables'])) {
