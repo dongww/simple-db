@@ -85,10 +85,11 @@ abstract class ManagerAbstract
                 continue;
             }
 
-            $ManagerClass = '\\Data\\' . ucfirst($i) . 'Manager';
-            $relId        = $data[$ManagerClass::$tableName . '_id'];
+            $ManagerClass = '\\DataManager\\' . ucfirst($i) . 'Manager';
+            $relKey = $ManagerClass::$tableName . '_id';
+            $relId        = $data[$relKey];
             if ($relId < 1) {
-                throw new \Exception('关联ID必须大于0！');
+                throw new \Exception(sprintf('关联ID %s 必须大于0！', $relKey));
             }
             $rel = \R::load($ManagerClass::$tableName, $relId);
 
