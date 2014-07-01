@@ -63,7 +63,15 @@ abstract class ManagerAbstract
             $value = $this->cleanValue($f['type'], $data[$fieldName]);
 
             if ($f['options']['unique']) {
-                $exist = \R::findOne(static::$tableName, sprintf(' %s = ? ', $f['name']), [$value]);
+                if ($bean->id) {
+                    $exist = \R::findOne(
+                        static::$tableName,
+                        sprintf(' %s = ? and id != ? ', $f['name']),
+                        [$value, $bean->id]
+                    );
+                } else {
+                    $exist = \R::findOne(static::$tableName, sprintf(' %s = ? ', $f['name']), [$value]);
+                }
                 if ($exist) {
                     throw new \Exception('数据唯一性错误！');
                 }
