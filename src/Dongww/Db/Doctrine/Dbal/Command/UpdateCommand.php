@@ -5,7 +5,7 @@
  * Time: 上午9:39
  */
 
-namespace Dongww\Db\Dbal\Command;
+namespace Dongww\Db\Doctrine\Dbal\Command;
 
 use Doctrine\DBAL\Connection;
 use Dongww\Db\Dbal\Checker;

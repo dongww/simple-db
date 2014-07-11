@@ -5,7 +5,7 @@
  * Time: 下午2:44
  */
 
-namespace Dongww\Db\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Core;
 
 use Symfony\Component\Yaml\Parser;
 

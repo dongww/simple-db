@@ -5,7 +5,7 @@
  * Time: 下午2:31
  */
 
-namespace Dongww\Db\Dbal\Behavior;
+namespace Dongww\Db\Doctrine\Dbal\Behavior;
 
 
 use Doctrine\DBAL\Schema\Table;

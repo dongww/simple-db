@@ -5,7 +5,7 @@
  * Time: 下午2:14
  */
 
-namespace Dongww\Db\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Core;
 
 class Bean
 {

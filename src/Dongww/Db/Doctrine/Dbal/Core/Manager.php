@@ -5,7 +5,7 @@
  * Time: 下午2:32
  */
 
-namespace Dongww\Db\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Core;
 
 use Dongww\Db\Dbal\ManagerFactory;
 use Doctrine\DBAL\Types\Type;

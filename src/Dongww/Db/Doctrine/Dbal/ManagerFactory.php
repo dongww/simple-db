@@ -5,7 +5,7 @@
  * Time: 下午3:57
  */
 
-namespace Dongww\Db\Dbal;
+namespace Dongww\Db\Doctrine\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Dongww\Db\Dbal\Core\Manager;

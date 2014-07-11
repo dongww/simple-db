@@ -5,7 +5,7 @@
  * Time: 上午9:13
  */
 
-namespace Dongww\Db\Orm\Provider;
+namespace Dongww\Db\Doctrine\Orm\Provider;
 
 use Silex\ServiceProviderInterface;
 use Silex\Application;
