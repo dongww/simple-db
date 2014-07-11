@@ -21,8 +21,58 @@ abstract class ManagerAbstract
         if (!static::$tableName) {
             throw new \Exception('未定义表名');
         }
+        static::$tableName = $this->fixTableName();
+        static::$fields    = $this->fixFields();
+        static::$many2one  = $this->fixMany2One();
     }
 
+    public function getFields()
+    {
+        return static::$fields;
+    }
+
+    public function getMany2One()
+    {
+        return static::$many2one;
+    }
+
+    public function getTableName()
+    {
+        return static::$tableName;
+    }
+
+    /**
+     * 将表名转换为RedBean可以接受的格式
+     *
+     * @return string
+     */
+    protected function fixTableName()
+    {
+        return strtolower($this->getTableName());
+    }
+
+    protected function fixFields()
+    {
+        $fields = $this->getFields();
+
+        foreach ($fields as &$field) {
+            $field['name'] = strtolower($field['name']);
+        }
+
+        return $fields;
+    }
+
+    protected function fixMany2One()
+    {
+        return strtolower($this->getMany2One());
+    }
+
+    /**
+     * 新增数据
+     *
+     * @param array $data
+     * @return int|string
+     */
     public function add(array $data)
     {
         $bean = \R::dispense(static::$tableName);
@@ -35,7 +85,6 @@ abstract class ManagerAbstract
      * @param $id
      * @param array $exclude 排除的属性
      * @throws \Exception
-     * @internal param \Symfony\Component\HttpFoundation\Request $request
      * @return int|string
      */
     public function update(array $data, $id, $exclude = [])
@@ -44,9 +93,9 @@ abstract class ManagerAbstract
             throw new \Exception('查询 id 不能为空！');
         }
 
-        $bean = \R::load(static::$tableName, $id);
+        $bean = \R::load($this->getTableName(), $id);
         if (!$bean) {
-            throw new \Exception(static::$tableName . '：' . $id . ' 不存在');
+            throw new \Exception($this->getTableName() . '：' . $id . ' 不存在');
         }
 
         return $this->save($data, $bean, $exclude);
@@ -54,9 +103,18 @@ abstract class ManagerAbstract
 
     protected function save(array $data, $bean, $exclude = [])
     {
-        foreach (static::$fields as $f) {
+        $exclude = array_map('strtolower', $exclude);
+
+//        $tmpData = [];
+//        foreach ($data as $k => $v) {
+//            $newData[strtolower($k)] = $v;
+//        }
+//        $data = $tmpData;
+
+        foreach ($this->getFields() as $f) {
             $fieldName = $f['name'];
-            if (in_array($f['name'], $exclude)) {
+
+            if (in_array($fieldName, $exclude)) {
                 continue;
             }
 
@@ -65,12 +123,12 @@ abstract class ManagerAbstract
             if ($f['options']['unique']) {
                 if ($bean->id) {
                     $exist = \R::findOne(
-                        static::$tableName,
-                        sprintf(' %s = ? and id != ? ', $f['name']),
+                        $this->getTableName(),
+                        sprintf(' %s = ? and id != ? ', $fieldName),
                         [$value, $bean->id]
                     );
                 } else {
-                    $exist = \R::findOne(static::$tableName, sprintf(' %s = ? ', $f['name']), [$value]);
+                    $exist = \R::findOne($this->getTableName(), sprintf(' %s = ? ', $f['name']), [$value]);
                 }
                 if ($exist) {
                     throw new \Exception('数据唯一性错误！');
@@ -80,14 +138,16 @@ abstract class ManagerAbstract
             $bean->$f['name'] = $value;
         }
 
-        foreach (static::$many2one as $i) {
-            if (in_array($i . '_id', $exclude)) {
+        foreach ($this->getMany2One() as $i) {
+            $relTable = strtolower($i);
+            $relKey   = $relTable . '_id';
+
+            if (in_array($relKey, $exclude)) {
                 continue;
             }
 
-            $ManagerClass = '\\DataManager\\' . ucfirst($i) . 'Manager';
-            $relKey = $ManagerClass::$tableName . '_id';
-            $relId        = $data[$relKey];
+//            $ManagerClass = '\\DataManager\\' . ucfirst($i) . 'Manager';
+            $relId = $data[$relKey];
             if ($relId < 1) {
                 throw new \Exception(sprintf('关联ID %s 必须大于0！', $relKey));
             }
@@ -233,11 +293,6 @@ abstract class ManagerAbstract
         }
 
         return $return;
-    }
-
-    public function getFields()
-    {
-        return static::$fields;
     }
 
     public function asArray($id)
