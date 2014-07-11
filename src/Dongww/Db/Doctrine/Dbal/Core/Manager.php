@@ -7,7 +7,7 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Core;
 
-use Dongww\Db\Dbal\ManagerFactory;
+use Dongww\Db\Doctrine\Dbal\ManagerFactory;
 use Doctrine\DBAL\Types\Type;
 
 class Manager
