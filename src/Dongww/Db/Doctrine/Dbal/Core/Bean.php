@@ -26,7 +26,7 @@ class Bean
     }
 
     /**
-     * @return \Dongww\Db\Dbal\Core\Manager
+     * @return \Dongww\Db\Doctrine\Dbal\Core\Manager
      */
     public function getManager()
     {

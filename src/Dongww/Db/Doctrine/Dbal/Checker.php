@@ -11,8 +11,8 @@ namespace Dongww\Db\Doctrine\Dbal;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Dongww\Db\Dbal\Core\Structure;
-use Dongww\Db\Dbal\Behavior;
+use Dongww\Db\Doctrine\Dbal\Core\Structure;
+use Dongww\Db\Doctrine\Dbal\Behavior;
 
 class Checker
 {

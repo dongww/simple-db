@@ -8,15 +8,15 @@
 namespace Dongww\Db\Doctrine\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Dongww\Db\Dbal\Core\Manager;
-use Dongww\Db\Dbal\Core\Structure;
+use Dongww\Db\Doctrine\Dbal\Core\Manager;
+use Dongww\Db\Doctrine\Dbal\Core\Structure;
 use Doctrine\DBAL\Logging\DebugStack;
 
 class ManagerFactory
 {
     /** @var  Connection */
     protected $conn;
-    /** @var  Structure */
+    /** @var  Core\Structure */
     protected $structure;
 
     /** @var Core\Manager[] */
@@ -27,7 +27,7 @@ class ManagerFactory
     /** @var DebugStack */
     protected $logger;
 
-    public function __construct($conn, Structure $structure, $debug = false)
+    public function __construct($conn, Core\Structure $structure, $debug = false)
     {
         $this->debug = (bool)$debug;
         $this->setConnection($conn);
@@ -53,9 +53,9 @@ class ManagerFactory
     }
 
     /**
-     * @param \Dongww\Db\Dbal\Core\Structure $structure
+     * @param Core\Structure $structure
      */
-    public function setStructure(Structure $structure)
+    public function setStructure(Core\Structure $structure)
     {
         $this->structure = $structure;
     }

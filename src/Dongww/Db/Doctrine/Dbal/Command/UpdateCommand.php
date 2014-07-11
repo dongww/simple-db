@@ -8,7 +8,7 @@
 namespace Dongww\Db\Doctrine\Dbal\Command;
 
 use Doctrine\DBAL\Connection;
-use Dongww\Db\Dbal\Checker;
+use Dongww\Db\Doctrine\Dbal\Checker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
