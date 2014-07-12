@@ -12,35 +12,24 @@ class SimpleManager implements ManagerInterface
     use ManagerTraits;
 
     protected $fields = [];
-    protected $one2one = [];
-    protected $one2many = [];
     protected $many2one = [];
 
     protected $tableName = null;
 
-    protected function __construct(array $structure)
+    protected function __construct(array $structure, StructureParserInterface $parser)
     {
-        $this->tableName = key($structure);
-
-        foreach ($structure['fields'] as $k => $v) {
-            $field            = [];
-            $field['name']    = $k;
-            $field['type']    = $v['type'];
-            $field['options'] = $v['options'];
-
-            $this->fields[] = $field;
-        }
-
-        $this->many2one = $structure['parents'];
+        $this->tableName = $parser->getTableName();
+        $this->fields    = $parser->getFields();
+        $this->many2one  = $parser->getMany2One();
 
         $this->tableName = $this->fixTableName();
         $this->fields    = $this->fixFields();
         $this->many2one  = $this->fixMany2One();
     }
 
-    public static function createFromStructure(array $structure)
+    public static function createFromStructure(array $structure, StructureParserInterface $parser)
     {
-        return new self($structure);
+        return new self($structure, $parser);
     }
 
     public function getFields()
