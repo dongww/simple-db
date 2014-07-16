@@ -8,7 +8,7 @@
 namespace Dongww\Db\Doctrine\Dbal\Core;
 
 
-class Query implements QueryInterface
+class Reader implements QueryInterface
 {
     protected $medoo;
 
@@ -18,7 +18,7 @@ class Query implements QueryInterface
     }
 
 
-    public function select($table, $join = null, $columns = null, $where = null)
+    public function select($table, $join = null, $columns = '*', $where = null)
     {
         if ($join) {
             return $this->medoo->select($table, $join, $columns, $where);
@@ -27,7 +27,7 @@ class Query implements QueryInterface
         }
     }
 
-    public function get($table, $columns, $where = null)
+    public function get($table, $columns = '*', $where = null)
     {
         return $this->medoo->get($table, $columns, $where);
     }
@@ -41,7 +41,7 @@ class Query implements QueryInterface
         }
     }
 
-    public function count($table, $join = null, $column = null, $where = null)
+    public function count($table, $join = null, $column = '*', $where = null)
     {
         if ($join && $column) {
             return $this->medoo->count($table, $join, $column, $where);

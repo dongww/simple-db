@@ -15,6 +15,7 @@ class TreeBehavior implements BehaviorInterface
 
     public function doIt(Table $table)
     {
+        $table->addColumn("title", "string", ['notnull' => false]);
         $table->addColumn("sort", "integer", ['notnull' => false]);
         $table->addColumn("path", "string", ['notnull' => false]);
         $table->addColumn("level", "integer", ['notnull' => false]);

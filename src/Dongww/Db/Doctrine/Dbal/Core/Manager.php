@@ -56,43 +56,19 @@ class Manager
     }
 
     /**
-     * 根据一个Id获取一个Bean
-     *
-     * @param $id
-     * @return Bean
-     * @throws \Exception
-     */
-    public function get($id)
-    {
-        if ((int)$id < 1) {
-            throw new \Exception('ID必须大于0！');
-        }
-
-        $qb = $this->getConnection()->createQueryBuilder();
-        $qb
-            ->select($this->allFields())
-            ->from($this->tableName, $this->aliases())
-            ->where($this->idField() . ' = ?')
-            ->setMaxResults(1)
-            ->setParameter(0, $id);
-
-        $stmt = $this->getConnection()->executeQuery($qb->getSQL(), $qb->getParameters());
-
-        $bean = new Bean($this);
-        $data = $stmt->fetch();
-        $bean->import($data ? $data : []);
-
-        return $bean;
-    }
-
-    /**
      * 创建一个没有数据的 Bean
      *
+     * @param array $data
      * @return Bean
      */
-    public function createBean()
+    public function createBean(array $data = null)
     {
-        return new Bean($this);
+        $bean = new Bean($this);
+        if ($data) {
+            $bean->import($data);
+        }
+
+        return $bean;
     }
 
     /**
@@ -118,7 +94,7 @@ class Manager
             }
         }
 
-        if (is_array($tblStructure['parents'])) {
+        if (isset($tblStructure['parents']) && is_array($tblStructure['parents'])) {
             foreach ($tblStructure['parents'] as $name) {
                 $fid        = self::foreignKey($name);
                 $data[$fid] = $bean->get($fid);
@@ -138,7 +114,7 @@ class Manager
                 ['id' => $bean->id],
                 $types
             );
-        } else {
+        } else { //todo behavior 的插入需要重构，不能写死，须以注册的方式，以便可使用自定义behavier。
             if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
                 $data['created_at'] = new \DateTime();
                 $data['updated_at'] = new \DateTime();
@@ -146,7 +122,21 @@ class Manager
                 $types[]            = Type::getType('datetime');
             }
 
-            return $this->getConnection()->insert(
+            if (isset($tblStructure['tree_able']) ? (bool)$tblStructure['tree_able'] : false) {
+                $data['title']     = $bean->title;
+                $data['sort']      = $bean->sort;
+                $data['path']      = $bean->path;
+                $data['level']     = $bean->level;
+                $data['parent_id'] = $bean->parent_id;
+
+                $types[] = Type::getType('string');
+                $types[] = Type::getType('integer');
+                $types[] = Type::getType('string');
+                $types[] = Type::getType('integer');
+                $types[] = Type::getType('integer');
+            }
+
+            return $bean->id = $this->getConnection()->insert(
                 $this->getTableName(),
                 $data,
                 $types
@@ -166,11 +156,6 @@ class Manager
             $this->tableName,
             ['id' => $bean->id]
         );
-    }
-
-    public function findAll()
-    {
-        //TODO
     }
 
     public function cleanData($type, $oldValue)
@@ -200,16 +185,16 @@ class Manager
         return $value;
     }
 
-    public function allFields($tableName = null)
+    protected function allFields($tableName = null)
     {
         if ($tableName == null) {
-            $tableName = $this->tableName;
+            $tableName = $this->aliases();
         }
 
         return $tableName . '.*';
     }
 
-    public function aliases($tableName = null)
+    protected function aliases($tableName = null)
     {
         if ($tableName == null) {
             $tableName = $this->tableName;
@@ -218,7 +203,7 @@ class Manager
         return $tableName;
     }
 
-    public function idField($tableName = null)
+    protected function idField($tableName = null)
     {
         if ($tableName == null) {
             $tableName = $this->tableName;
@@ -230,5 +215,81 @@ class Manager
     public static function foreignKey($foreignTable)
     {
         return $foreignTable . '_id';
+    }
+
+    public function getReader()
+    {
+        return $this->getManagerFactory()->getReader();
+    }
+
+    /**
+     * 根据一个Id获取一个Bean
+     *
+     * @param $id
+     * @return Bean
+     * @throws \Exception
+     */
+    public function get($id)
+    {
+        if ((int)$id < 1) {
+            throw new \Exception('ID必须大于0！');
+        }
+
+        $qb = $this->getConnection()->createQueryBuilder();
+        $qb
+            ->select($this->allFields())
+            ->from($this->tableName, $this->aliases())
+            ->where($this->idField() . ' = ?')
+            ->setMaxResults(1)
+            ->setParameter(0, $id);
+
+        $data = $this->getConnection()->fetchAssoc($qb->getSQL(), $qb->getParameters());
+        $bean = $this->createBean($data);
+
+        return $bean;
+    }
+
+    public function select($join = null, $columns = '*', $where = null)
+    {
+        $query = $this->getReader();
+        $data  = $query->select($this->getTableName(), $join, $columns, $where);
+
+        $beanArr = [];
+
+        foreach ($data as $row) {
+            $beanArr[] = $this->createBean($row);
+        }
+
+        return $this->createBean($data);
+    }
+
+    public function has($join = null, $where = null)
+    {
+        $query = $this->getReader();
+        $data  = $query->has($this->getTableName(), $join, $where);
+
+        return $this->createBean($data);
+    }
+
+    public function count($join = null, $column = '*', $where = null)
+    {
+        $query = $this->getReader();
+        $data  = $query->count($this->getTableName(), $join, $column, $where);
+
+        return $this->createBean($data);
+    }
+
+    public function query($sql)
+    {
+        $conn = $this->getConnection();
+        $stmt = $conn->query($sql);
+
+        $beanArr = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $beanArr[] = $this->createBean($row);
+        }
+
+        return $beanArr;
     }
 }

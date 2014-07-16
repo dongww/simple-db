@@ -43,6 +43,14 @@ class Bean
         return $this->manager->getManagerFactory();
     }
 
+    public function getTableStructure()
+    {
+        return $this
+            ->getManagerFactory()
+            ->getStructure()
+            ->getTableStructure($this->getTableName());
+    }
+
     public function __set($name, $value)
     {
         $this->data[$name] = $value;
@@ -61,7 +69,11 @@ class Bean
 
     public function get($name)
     {
-        return isset($this->data[$name]) ? $this->data[$name] : null;
+        if (isset($this->data[$name])) {
+            return $this->data[$name];
+        }
+
+        return $this->getParent($name);
     }
 
     public function import(array $data)
@@ -80,6 +92,14 @@ class Bean
         $parentId = Manager::foreignKey($name);
         if (!isset($this->data[$parentId])) {
             return null;
+        }
+
+        if ($name == 'parent') {
+            $tblStructure = $this->getTableStructure($name);
+            if ($tblStructure['tree_able']) {
+                $m = $this->getManager();
+                return $m->get($this->data[$parentId]);
+            }
         }
 
         $m = $this->getManagerFactory()->getManager($name);

@@ -11,6 +11,7 @@ use Doctrine\DBAL\Connection;
 use Dongww\Db\Doctrine\Dbal\Core\Manager;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
 use Doctrine\DBAL\Logging\DebugStack;
+use Dongww\Db\Doctrine\Dbal\Core\TreeManager;
 
 class ManagerFactory
 {
@@ -21,6 +22,12 @@ class ManagerFactory
 
     /** @var Core\Manager[] */
     protected static $managers = [];
+
+    /** @var  Core\MedooAdapter */
+    protected $medoo;
+
+    /** @var  Core\Reader */
+    protected $reader;
 
     protected $debug;
 
@@ -52,6 +59,24 @@ class ManagerFactory
         return $this->conn;
     }
 
+    public function getMedoo()
+    {
+        if (!($this->medoo instanceof Core\MedooAdapter)) {
+            $this->medoo = new Core\MedooAdapter($this->getConnection());
+        }
+
+        return $this->medoo;
+    }
+
+    public function getReader()
+    {
+        if (!($this->reader instanceof Core\Reader)) {
+            $this->reader = new Core\Reader($this->getMedoo());
+        }
+
+        return $this->reader;
+    }
+
     /**
      * @param Core\Structure $structure
      */
@@ -65,10 +90,19 @@ class ManagerFactory
         return $this->structure;
     }
 
+    /**
+     * @param $name
+     * @return Manager|TreeManager
+     */
     public function getManager($name)
     {
         if (!isset(self::$managers[$name])) {
-            self::$managers[$name] = new Manager($this, $name);
+            $tblStructure = $this->getStructure()->getTableStructure($name);
+            if ($tblStructure['tree_able']) {
+                self::$managers[$name] = new TreeManager($this, $name);
+            } else {
+                self::$managers[$name] = new Manager($this, $name);
+            }
         }
 
         return self::$managers[$name];
