@@ -205,11 +205,7 @@ class Manager
 
     protected function idField($tableName = null)
     {
-        if ($tableName == null) {
-            $tableName = $this->tableName;
-        }
-
-        return $tableName . '.id';
+        return $this->aliases($tableName) . '.id';
     }
 
     public static function foreignKey($foreignTable)
