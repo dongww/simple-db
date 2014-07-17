@@ -102,6 +102,20 @@ class Manager
             }
         }
 
+        if (isset($tblStructure['tree_able']) ? (bool)$tblStructure['tree_able'] : false) {
+            $data['title']     = $bean->title;
+            $data['sort']      = $bean->sort;
+            $data['path']      = $bean->path;
+            $data['level']     = $bean->level;
+            $data['parent_id'] = $bean->parent_id;
+
+            $types[] = Type::getType('string');
+            $types[] = Type::getType('integer');
+            $types[] = Type::getType('string');
+            $types[] = Type::getType('integer');
+            $types[] = Type::getType('integer');
+        }
+
         if ($bean->id) {
             if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
                 $data['updated_at'] = new \DateTime();
@@ -120,20 +134,6 @@ class Manager
                 $data['updated_at'] = new \DateTime();
                 $types[]            = Type::getType('datetime');
                 $types[]            = Type::getType('datetime');
-            }
-
-            if (isset($tblStructure['tree_able']) ? (bool)$tblStructure['tree_able'] : false) {
-                $data['title']     = $bean->title;
-                $data['sort']      = $bean->sort;
-                $data['path']      = $bean->path;
-                $data['level']     = $bean->level;
-                $data['parent_id'] = $bean->parent_id;
-
-                $types[] = Type::getType('string');
-                $types[] = Type::getType('integer');
-                $types[] = Type::getType('string');
-                $types[] = Type::getType('integer');
-                $types[] = Type::getType('integer');
             }
 
             return $bean->id = $this->getConnection()->insert(
@@ -245,10 +245,10 @@ class Manager
         return $bean;
     }
 
-    public function select($join = null, $columns = '*', $where = null)
+    public function select($join = null, $where = null)
     {
         $query = $this->getReader();
-        $data  = $query->select($this->getTableName(), $join, $columns, $where);
+        $data  = $query->select($this->getTableName(), $join, '*', $where);
 
         $beanArr = [];
 
@@ -267,10 +267,10 @@ class Manager
         return $this->createBean($data);
     }
 
-    public function count($join = null, $column = '*', $where = null)
+    public function count($join = null, $where = null)
     {
         $query = $this->getReader();
-        $data  = $query->count($this->getTableName(), $join, $column, $where);
+        $data  = $query->count($this->getTableName(), $join, '*', $where);
 
         return $this->createBean($data);
     }

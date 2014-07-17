@@ -10,10 +10,13 @@ namespace Dongww\Db\Doctrine\Dbal\Core;
 
 class TreeManager extends Manager
 {
+    const INSERT_PREVIOUS = 1;
+    const INSERT_NEXT     = 2;
+
     public function addChildNode(Bean $bean, Bean $parentBean = null)
     {
-        $qb = $this->getConnection()->createQueryBuilder();
-        $qb
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
             ->select('max(sort)')
             ->from($this->tableName, $this->aliases());
 
@@ -37,16 +40,34 @@ class TreeManager extends Manager
 
     public function addPreNode(Bean $insertBean, Bean $currentBean)
     {
+        $this->insertNode($insertBean, $currentBean, self::INSERT_PREVIOUS);
+    }
+
+    public function addNextNode(Bean $insertBean, Bean $currentBean)
+    {
+        $this->insertNode($insertBean, $currentBean, self::INSERT_NEXT);
+    }
+
+    public function insertNode(Bean $insertBean, Bean $currentBean, $position = self::INSERT_NEXT)
+    {
         $parentId   = $currentBean->parent_id;
         $sort       = $currentBean->sort;
         $parentBean = $currentBean->parent;
 
-        $qb = $this->getConnection()->createQueryBuilder();
-        $qb
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
             ->update($this->tableName, $this->aliases())
-            ->set('sort', 'sort + 1')
-            ->where('sort >= :sort')
-            ->setParameter('sort', $sort);
+            ->set('sort', 'sort + 1');
+
+        if ($position == self::INSERT_PREVIOUS) {
+            $qb->where('sort >= :sort');
+            $insertBean->sort = $sort;
+        } else {
+            $qb->where('sort > :sort');
+            $insertBean->sort = $sort + 1;
+        }
+
+        $qb->setParameter('sort', $sort);
 
         if ($parentId) {
             $qb
@@ -58,15 +79,122 @@ class TreeManager extends Manager
 
         $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
 
-//        var_dump($qb->getSQL());
-//        var_dump($qb->getParameters());
-
-        $insertBean->sort      = $sort;
         $insertBean->parent_id = $parentId;
         $insertBean->path      = $this->getChildPath($parentBean);
         $insertBean->level     = $this->getChildLevel($parentBean);
 
         return $this->store($insertBean);
+    }
+
+    public function move(Bean $bean, Bean $newParentBean = null, $newSort = 1)
+    {
+        $oldParentId = $bean->parent_id;
+        $oldSort     = $bean->sort;
+
+        //原来的同级排序进行压缩
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
+            ->update($this->tableName, $this->aliases())
+            ->set('sort', 'sort - 1')
+            ->where('sort > :sort')
+            ->setParameter('sort', $oldSort);
+
+        if ($oldParentId) {
+            $qb
+                ->andWhere('parent_id = :pid')
+                ->setParameter('pid', $oldParentId);
+        } else {
+            $qb->andWhere('parent_id is null');
+        }
+
+        $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
+
+        //新的统计排序给出空挡
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
+            ->update($this->tableName, $this->aliases())
+            ->set('sort', 'sort + 1')
+            ->where('sort >= :sort')
+            ->setParameter('sort', $newSort);
+
+        if ($newParentBean) {
+            $qb
+                ->andWhere('parent_id = :pid')
+                ->setParameter('pid', $newParentBean->id);
+        } else {
+            $qb->andWhere('parent_id is null');
+        }
+
+        $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
+
+        $replacePathFrom  = $bean->path . $bean->id . '/';
+        $replaceLevelFrom = $bean->level;
+
+        //更新移动节点的path、sort、level
+        $bean->parent_id = $newParentBean ? $newParentBean->id : null;
+        $bean->sort      = $newSort;
+        $bean->path      = $this->getChildPath($newParentBean);
+        $bean->level     = $this->getChildLevel($newParentBean);
+//var_dump($bean);
+        //更新所有子节点的路径
+        if ($this->store($bean)) { //echo 1;exit;
+            $replacePathTo  = $bean->path . $bean->id . '/';
+            $replaceLevelTo = $bean->level;
+
+            $qb = $this->getConnection()
+                ->createQueryBuilder()
+                ->update($this->tableName, $this->aliases())
+                ->set('path', 'REPLACE(path, :replace_path_from, :replace_path_to)')
+                ->set('level', 'level + ( :replace_level_to - :replace_level_from )')
+                ->where('path like :like')
+                ->setParameter('replace_path_from', $replacePathFrom)
+                ->setParameter('replace_path_to', $replacePathTo)
+                ->setParameter('replace_level_to', $replaceLevelTo)
+                ->setParameter('replace_level_from', $replaceLevelFrom)
+                ->setParameter('like', $replacePathFrom . '%');
+
+            $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function remove(Bean $bean)
+    {
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
+            ->select('id')
+            ->from($this->tableName, $this->aliases())
+            ->where('parent_id = :pid')
+            ->setParameter('pid', $bean->id);
+
+        $data = $this->getConnection()->fetchAll($qb->getSQL(), $qb->getParameters());
+//        var_dump($ids);
+        foreach ($data as $d) {
+            $childBean = $this->get($d['id']);
+            $this->move($childBean, null, 1);
+        }
+
+        $qb = $this->getConnection()
+            ->createQueryBuilder()
+            ->update($this->tableName, $this->aliases())
+            ->set('sort', 'sort - 1')
+            ->where('sort > :sort')
+            ->setParameter('sort', $bean->sort);
+
+        if ($bean->parent_id) {
+            $qb
+                ->andWhere('parent_id = :pid')
+                ->setParameter('pid', $bean->parent_id);
+        } else {
+            $qb->andWhere('parent_id is null');
+        }
+
+        $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
+
+        parent::remove($bean);
     }
 
     protected function getChildPath(Bean $bean = null)
