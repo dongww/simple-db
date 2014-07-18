@@ -288,4 +288,18 @@ class Manager
 
         return $beanArr;
     }
+
+    public function getSelectQueryBuilder()
+    {
+        return $this->getConnection()
+            ->createQueryBuilder()
+            ->from($this->tableName, $this->aliases());
+    }
+
+    public function getUpdateQueryBuilder()
+    {
+        return $this->getConnection()
+            ->createQueryBuilder()
+            ->update($this->tableName, $this->aliases());
+    }
 }

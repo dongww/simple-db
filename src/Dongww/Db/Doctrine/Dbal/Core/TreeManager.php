@@ -15,10 +15,8 @@ class TreeManager extends Manager
 
     public function addChildNode(Bean $bean, Bean $parentBean = null)
     {
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
-            ->select('max(sort)')
-            ->from($this->tableName, $this->aliases());
+        $qb = $this->getSelectQueryBuilder()
+            ->select('max(sort)');
 
         if ($parentBean != null) {
             $qb
@@ -54,9 +52,7 @@ class TreeManager extends Manager
         $sort       = $currentBean->sort;
         $parentBean = $currentBean->parent;
 
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
-            ->update($this->tableName, $this->aliases())
+        $qb = $this->getUpdateQueryBuilder()
             ->set('sort', 'sort + 1');
 
         if ($position == self::INSERT_PREVIOUS) {
@@ -92,9 +88,7 @@ class TreeManager extends Manager
         $oldSort     = $bean->sort;
 
         //原来的同级排序进行压缩
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
-            ->update($this->tableName, $this->aliases())
+        $qb = $this->getUpdateQueryBuilder()
             ->set('sort', 'sort - 1')
             ->where('sort > :sort')
             ->setParameter('sort', $oldSort);
@@ -110,9 +104,7 @@ class TreeManager extends Manager
         $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
 
         //新的统计排序给出空挡
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
-            ->update($this->tableName, $this->aliases())
+        $qb = $this->getUpdateQueryBuilder()
             ->set('sort', 'sort + 1')
             ->where('sort >= :sort')
             ->setParameter('sort', $newSort);
@@ -135,15 +127,13 @@ class TreeManager extends Manager
         $bean->sort      = $newSort;
         $bean->path      = $this->getChildPath($newParentBean);
         $bean->level     = $this->getChildLevel($newParentBean);
-//var_dump($bean);
+
         //更新所有子节点的路径
         if ($this->store($bean)) { //echo 1;exit;
             $replacePathTo  = $bean->path . $bean->id . '/';
             $replaceLevelTo = $bean->level;
 
-            $qb = $this->getConnection()
-                ->createQueryBuilder()
-                ->update($this->tableName, $this->aliases())
+            $qb = $this->getUpdateQueryBuilder()
                 ->set('path', 'REPLACE(path, :replace_path_from, :replace_path_to)')
                 ->set('level', 'level + ( :replace_level_to - :replace_level_from )')
                 ->where('path like :like')
@@ -163,23 +153,19 @@ class TreeManager extends Manager
 
     public function remove(Bean $bean)
     {
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
+        $qb = $this->getSelectQueryBuilder()
             ->select('id')
-            ->from($this->tableName, $this->aliases())
             ->where('parent_id = :pid')
             ->setParameter('pid', $bean->id);
 
         $data = $this->getConnection()->fetchAll($qb->getSQL(), $qb->getParameters());
-//        var_dump($ids);
+
         foreach ($data as $d) {
             $childBean = $this->get($d['id']);
             $this->move($childBean, null, 1);
         }
 
-        $qb = $this->getConnection()
-            ->createQueryBuilder()
-            ->update($this->tableName, $this->aliases())
+        $qb = $this->getUpdateQueryBuilder()
             ->set('sort', 'sort - 1')
             ->where('sort > :sort')
             ->setParameter('sort', $bean->sort);
