@@ -5,10 +5,11 @@
  * Time: 下午2:32
  */
 
-namespace Dongww\Db\Doctrine\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Manager;
 
-use Dongww\Db\Doctrine\Dbal\ManagerFactory;
 use Doctrine\DBAL\Types\Type;
+use Dongww\Db\Doctrine\Dbal\Core\Bean;
+use Dongww\Db\Doctrine\Dbal\Core\Structure;
 
 class Manager
 {

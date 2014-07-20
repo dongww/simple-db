@@ -5,22 +5,21 @@
  * Time: 下午3:57
  */
 
-namespace Dongww\Db\Doctrine\Dbal;
+namespace Dongww\Db\Doctrine\Dbal\Manager;
 
+use Dongww\Db\Doctrine\Dbal\Core;
 use Doctrine\DBAL\Connection;
-use Dongww\Db\Doctrine\Dbal\Core\Manager;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
 use Doctrine\DBAL\Logging\DebugStack;
-use Dongww\Db\Doctrine\Dbal\Core\TreeManager;
 
 class ManagerFactory
 {
     /** @var  Connection */
     protected $conn;
-    /** @var  Core\Structure */
+    /** @var  Structure */
     protected $structure;
 
-    /** @var Core\Manager[] */
+    /** @var Manager[] */
     protected static $managers = [];
 
     /** @var  Core\MedooAdapter */
@@ -34,7 +33,7 @@ class ManagerFactory
     /** @var DebugStack */
     protected $logger;
 
-    public function __construct($conn, Core\Structure $structure, $debug = false)
+    public function __construct($conn, Structure $structure, $debug = false)
     {
         $this->debug = (bool)$debug;
         $this->setConnection($conn);

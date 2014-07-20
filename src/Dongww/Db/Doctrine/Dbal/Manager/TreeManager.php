@@ -5,8 +5,9 @@
  * Time: 上午10:01
  */
 
-namespace Dongww\Db\Doctrine\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Manager;
 
+use Dongww\Db\Doctrine\Dbal\Core;
 
 class TreeManager extends Manager
 {

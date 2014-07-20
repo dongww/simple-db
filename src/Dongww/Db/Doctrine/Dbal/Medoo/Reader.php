@@ -5,8 +5,9 @@
  * Time: 上午9:23
  */
 
-namespace Dongww\Db\Doctrine\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Medoo;
 
+use Dongww\Db\Doctrine\Dbal\Core\QueryInterface;
 
 class Reader implements QueryInterface
 {

@@ -5,11 +5,9 @@
  * Time: 下午3:31
  */
 
-namespace Dongww\Db\Doctrine\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Medoo;
 
 use Doctrine\DBAL\Connection;
-
-//use Dongww\Db\Medoo\Medoo;
 
 class MedooAdapter extends \medoo
 {

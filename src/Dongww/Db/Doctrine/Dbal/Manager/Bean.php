@@ -5,7 +5,7 @@
  * Time: 下午2:14
  */
 
-namespace Dongww\Db\Doctrine\Dbal\Core;
+namespace Dongww\Db\Doctrine\Dbal\Manager;
 
 class Bean
 {
@@ -26,7 +26,7 @@ class Bean
     }
 
     /**
-     * @return \Dongww\Db\Doctrine\Dbal\Core\Manager
+     * @return Manager
      */
     public function getManager()
     {
