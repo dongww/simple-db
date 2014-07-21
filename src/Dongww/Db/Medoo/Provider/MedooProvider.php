@@ -7,6 +7,8 @@
 
 namespace Dongww\Db\Medoo\Provider;
 
+use Silex\ServiceProviderInterface;
+use Silex\Application;
 
 class MedooProvider implements ServiceProviderInterface
 {
