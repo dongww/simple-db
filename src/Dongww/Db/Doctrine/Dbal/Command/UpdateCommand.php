@@ -66,16 +66,16 @@ class UpdateCommand extends Command
         $sql = $checker->getDiffSql($structureFile);
 
         if (empty($sql)) {
-            $output->writeln('No changed!');
+            $output->writeln('Nothing has changed.');
         } else {
-            $output->writeln('Start updating the database!');
+            $output->writeln('Began to update the database.');
             $output->writeln('//sql--------------------');
             foreach ($sql as $s) {
                 $output->writeln($s . ';');
                 $this->conn->query($s);
             }
             $output->writeln('\\\\end sql----------------');
-            $output->writeln('Database updated!');
+            $output->writeln('Database has been updated!');
         }
     }
 }
