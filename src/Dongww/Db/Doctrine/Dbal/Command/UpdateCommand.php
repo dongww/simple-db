@@ -31,14 +31,14 @@ class UpdateCommand extends Command
             ->setDescription('更新数据库。')
             ->addOption(
                 'config',
-                null,
+                'c',
                 InputOption::VALUE_OPTIONAL,
                 'The config file Path.',
                 'config/config.php'
             )
             ->addOption(
                 'structure',
-                null,
+                's',
                 InputOption::VALUE_OPTIONAL,
                 'The structure file Path.',
                 'config/structure.yml'
