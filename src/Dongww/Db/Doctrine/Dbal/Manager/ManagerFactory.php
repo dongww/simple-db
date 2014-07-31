@@ -7,7 +7,7 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Manager;
 
-use Dongww\Db\Doctrine\Dbal\Core;
+use Dongww\Db\Doctrine\Dbal\Medoo;
 use Doctrine\DBAL\Connection;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
 use Doctrine\DBAL\Logging\DebugStack;
@@ -22,10 +22,10 @@ class ManagerFactory
     /** @var Manager[] */
     protected static $managers = [];
 
-    /** @var  Core\MedooAdapter */
+    /** @var  Medoo\MedooAdapter */
     protected $medoo;
 
-    /** @var  Core\Reader */
+    /** @var  Medoo\Reader */
     protected $reader;
 
     protected $debug;
@@ -60,8 +60,8 @@ class ManagerFactory
 
     public function getMedoo()
     {
-        if (!($this->medoo instanceof Core\MedooAdapter)) {
-            $this->medoo = new Core\MedooAdapter($this->getConnection());
+        if (!($this->medoo instanceof Medoo\MedooAdapter)) {
+            $this->medoo = new Medoo\MedooAdapter($this->getConnection());
         }
 
         return $this->medoo;
@@ -69,17 +69,17 @@ class ManagerFactory
 
     public function getReader()
     {
-        if (!($this->reader instanceof Core\Reader)) {
-            $this->reader = new Core\Reader($this->getMedoo());
+        if (!($this->reader instanceof Medoo\Reader)) {
+            $this->reader = new Medoo\Reader($this->getMedoo());
         }
 
         return $this->reader;
     }
 
     /**
-     * @param Core\Structure $structure
+     * @param Structure $structure
      */
-    public function setStructure(Core\Structure $structure)
+    public function setStructure(Structure $structure)
     {
         $this->structure = $structure;
     }
@@ -107,7 +107,7 @@ class ManagerFactory
         return self::$managers[$name];
     }
 
-    public function getSqlStack($simple = true)
+    public function getSqlStack( /*$simple = true*/)
     {
         if (!$this->debug) {
             return null;

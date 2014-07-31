@@ -8,7 +8,7 @@
 namespace Dongww\Db\Doctrine\Dbal\Manager;
 
 use Doctrine\DBAL\Types\Type;
-use Dongww\Db\Doctrine\Dbal\Core\Bean;
+use Dongww\Db\Doctrine\Dbal\Manager\Bean;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
 
 class Manager
@@ -129,7 +129,7 @@ class Manager
                 ['id' => $bean->id],
                 $types
             );
-        } else { //todo behavior 的插入需要重构，不能写死，须以注册的方式，以便可使用自定义behavier。
+        } else { //todo behavior 的插入需要重构，不能写死，须以注册的方式，以便可使用自定义behavior。
             if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
                 $data['created_at'] = new \DateTime();
                 $data['updated_at'] = new \DateTime();
@@ -265,7 +265,7 @@ class Manager
         $query = $this->getReader();
         $data  = $query->has($this->getTableName(), $join, $where);
 
-        return $this->createBean($data);
+        return $data;
     }
 
     public function count($join = null, $where = null)
@@ -273,7 +273,7 @@ class Manager
         $query = $this->getReader();
         $data  = $query->count($this->getTableName(), $join, '*', $where);
 
-        return $this->createBean($data);
+        return $data;
     }
 
     public function query($sql)
