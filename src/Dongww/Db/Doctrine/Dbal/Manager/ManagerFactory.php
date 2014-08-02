@@ -91,13 +91,19 @@ class ManagerFactory
 
     /**
      * @param $name
+     * @throws \Exception
      * @return Manager|TreeManager
      */
     public function getManager($name)
     {
+        $structureData = $this->getStructure()->getStructure();
+        if (!isset($structureData['tables'][$name])) {
+            throw new \Exception(sprintf('数据表 %s 不存在', $name));
+        }
+
         if (!isset(self::$managers[$name])) {
             $tblStructure = $this->getStructure()->getTableStructure($name);
-            if ($tblStructure['tree_able']) {
+            if (isset($tblStructure['tree_able'])) {
                 self::$managers[$name] = new TreeManager($this, $name);
             } else {
                 self::$managers[$name] = new Manager($this, $name);
