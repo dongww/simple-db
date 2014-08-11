@@ -87,7 +87,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 获取树形分类html视图，可指定根节点
      *
-     * @param int $parent
+     * @param  int $parent
      * @return string
      */
     public function getTreeView($parent = 0)
@@ -123,7 +123,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 在选择的分类下添加子分类，如果未选择父分类，则添加到根
      *
-     * @param int $parentId
+     * @param  int $parentId
      * @param $title
      * @return bool
      */
@@ -334,9 +334,10 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
 
     /**
      * 删除一个分类
+
      *
-     * @param $nodeId
-     * @param array $options
+*@param $nodeId
+     * @param  array $options
      * @return bool|void
      */
     public function delete($nodeId, $options = [])
@@ -369,9 +370,10 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
 
     /**
      * 设置路径和层次
+
      *
-     * @param $node
-     * @param null $parent
+*@param $node
+     * @param  null $parent
      * @return mixed
      */
     public function setPathLevel($node, $parent = null)
@@ -391,7 +393,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 获得排序后的列表
      *
-     * @param int $pid
+     * @param  int $pid
      * @return array|string
      */
     public function getSorted($pid = null)
@@ -427,9 +429,9 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     }
 
     /**
-     * @param $id
-     * @param bool $topLevel 是否只获取下一级
-     * @param bool $includeSelf 是否包含本身
+     * @param       $id
+     * @param  bool $topLevel    是否只获取下一级
+     * @param  bool $includeSelf 是否包含本身
      * @return array
      * @throws \Exception
      */

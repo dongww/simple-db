@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\RedBean;
 
-
 class SimpleConfigParser implements StructureParserInterface
 {
     protected $tableName = null;
@@ -45,4 +44,3 @@ class SimpleConfigParser implements StructureParserInterface
         return $this->many2one;
     }
 }
- 

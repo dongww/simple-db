@@ -98,6 +98,7 @@ class Bean
             $tblStructure = $this->getTableStructure($name);
             if ($tblStructure['tree_able']) {
                 $m = $this->getManager();
+
                 return $m->get($this->data[$parentId]);
             }
         }

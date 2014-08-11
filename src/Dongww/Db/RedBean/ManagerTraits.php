@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\RedBean;
 
-
 trait ManagerTraits
 {
     /**
@@ -39,7 +38,7 @@ trait ManagerTraits
     /**
      * 新增数据
      *
-     * @param array $data
+     * @param  array $data
      * @return int|string
      */
     public function add(array $data)
@@ -50,9 +49,9 @@ trait ManagerTraits
     }
 
     /**
-     * @param array $data
+     * @param  array $data
      * @param $id
-     * @param array $exclude 排除的属性
+     * @param  array $exclude 排除的属性
      * @throws \Exception
      * @return int|string
      */
@@ -152,7 +151,7 @@ trait ManagerTraits
             case 'string':
             case 'text':
             default:
-                $value = (string)$oldValue;
+            $value = (string)$oldValue;
         }
 
         return $value;
@@ -175,18 +174,21 @@ trait ManagerTraits
     public function findAll($sql = null, $bindings = array())
     {
         $sql = strtolower($sql);
+
         return \R::findAll($this->getTableName(), $sql, $bindings);
     }
 
     public function findOne($sql = null, $bindings = array())
     {
         $sql = strtolower($sql);
+
         return \R::findOne($this->getTableName(), $sql, $bindings);
     }
 
     public function count($sql = null, $bindings = array())
     {
         $sql = strtolower($sql);
+
         return \R::count($this->getTableName(), $sql, $bindings);
     }
 
@@ -249,9 +251,10 @@ trait ManagerTraits
 
     /**
      * 返回 $key => $value 形式的数组
+
      *
-     * @param $v
-     * @param string $k
+*@param $v
+     * @param  string $k
      * @return array
      */
     public function asMap($v, $k = 'id')

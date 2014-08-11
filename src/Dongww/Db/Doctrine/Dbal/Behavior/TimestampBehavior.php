@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Behavior;
 
-
 use Doctrine\DBAL\Schema\Table;
 
 class TimestampBehavior implements BehaviorInterface

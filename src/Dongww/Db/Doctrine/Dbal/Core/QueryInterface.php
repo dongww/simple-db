@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Core;
 
-
 interface QueryInterface
 {
     public function select($table, $join = null, $columns = null, $where = null);

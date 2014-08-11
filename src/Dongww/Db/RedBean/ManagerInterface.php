@@ -7,7 +7,6 @@
 
 namespace Dongww\Db\RedBean;
 
-
 interface ManagerInterface
 {
     public function getFields();

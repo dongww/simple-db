@@ -18,7 +18,6 @@ class Reader implements QueryInterface
         $this->medoo = $ma;
     }
 
-
     public function select($table, $join = null, $columns = '*', $where = null)
     {
         if ($join) {

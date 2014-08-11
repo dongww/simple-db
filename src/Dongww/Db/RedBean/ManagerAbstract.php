@@ -7,8 +7,6 @@
 
 namespace Dongww\Db\RedBean;
 
-use Dongww\Db\RedBean\ManagerTraits;
-
 abstract class ManagerAbstract implements ManagerInterface
 {
     use ManagerTraits;

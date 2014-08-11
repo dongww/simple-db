@@ -113,7 +113,7 @@ class ManagerFactory
         return self::$managers[$name];
     }
 
-    public function getSqlStack( /*$simple = true*/)
+    public function getSqlStack()
     {
         if (!$this->debug) {
             return null;

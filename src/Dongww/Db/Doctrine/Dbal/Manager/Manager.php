@@ -8,7 +8,6 @@
 namespace Dongww\Db\Doctrine\Dbal\Manager;
 
 use Doctrine\DBAL\Types\Type;
-use Dongww\Db\Doctrine\Dbal\Manager\Bean;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
 
 class Manager
@@ -59,7 +58,7 @@ class Manager
     /**
      * 创建一个没有数据的 Bean
      *
-     * @param array $data
+     * @param  array $data
      * @return Bean
      */
     public function createBean(array $data = null)
@@ -75,7 +74,7 @@ class Manager
     /**
      * 保存一个 Bean
      *
-     * @param Bean $bean
+     * @param  Bean $bean
      * @return int
      */
     public function store(Bean $bean)
@@ -148,7 +147,7 @@ class Manager
     /**
      * 从数据库删除指定Bean相对应的数据行
      *
-     * @param Bean $bean
+     * @param  Bean $bean
      * @return int
      */
     public function remove(Bean $bean)

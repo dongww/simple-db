@@ -10,7 +10,7 @@ namespace Dongww\Db\RedBean\Provider;
 use Silex\ServiceProviderInterface;
 use Silex\Application;
 
-class RbProvider implements ServiceProviderInterface
+class RbServiceProvider implements ServiceProviderInterface
 {
     public function register(Application $app)
     {
@@ -44,4 +44,3 @@ class RbProvider implements ServiceProviderInterface
         );
     }
 }
- 

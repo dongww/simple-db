@@ -7,8 +7,6 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Manager;
 
-use Dongww\Db\Doctrine\Dbal\Core;
-
 class TreeManager extends Manager
 {
     const INSERT_PREVIOUS = 1;

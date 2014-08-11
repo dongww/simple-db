@@ -7,12 +7,10 @@
 
 namespace Dongww\Db\Doctrine\Dbal;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Dongww\Db\Doctrine\Dbal\Core\Structure;
-use Dongww\Db\Doctrine\Dbal\Behavior;
 
 class Checker
 {
@@ -26,7 +24,7 @@ class Checker
     /**
      * 获得数据库的更改后的 SQL语句 数组
      *
-     * @param string $fileName 数据结构的文件名
+     * @param  string $fileName 数据结构的文件名
      * @return array
      */
     public function getDiffSql($fileName)
