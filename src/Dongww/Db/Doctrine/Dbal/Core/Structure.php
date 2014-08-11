@@ -25,7 +25,7 @@ class Structure
      *
      * @var array
      */
-    protected static $TYPE_MAP = [
+    protected static $typeMap = [
         self::TYPE_STRING   => 'string',
         self::TYPE_TEXT     => 'text',
         self::TYPE_INTEGER  => 'integer',
@@ -46,7 +46,7 @@ class Structure
 
     public static function getTypeMap()
     {
-        return self::$TYPE_MAP;
+        return self::$typeMap;
     }
 
     public static function createFromYaml($fileName)
