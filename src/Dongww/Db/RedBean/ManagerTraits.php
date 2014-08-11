@@ -38,7 +38,7 @@ trait ManagerTraits
     /**
      * 新增数据
      *
-     * @param  array $data
+     * @param  array      $data
      * @return int|string
      */
     public function add(array $data)
@@ -49,9 +49,9 @@ trait ManagerTraits
     }
 
     /**
-     * @param  array $data
-     * @param $id
-     * @param  array $exclude 排除的属性
+     * @param  array      $data
+     * @param             $id
+     * @param  array      $exclude 排除的属性
      * @throws \Exception
      * @return int|string
      */
@@ -140,18 +140,18 @@ trait ManagerTraits
                 $value = (new \DateTime($oldValue))->format('Y-m-d H:i:s');
                 break;
             case 'integer':
-                $value = (int)trim($oldValue);
+                $value = (int) trim($oldValue);
                 break;
             case 'float':
-                $value = (float)trim($oldValue);
+                $value = (float) trim($oldValue);
                 break;
             case 'bool':
-                $value = (bool)$oldValue;
+                $value = (bool) $oldValue;
                 break;
             case 'string':
             case 'text':
             default:
-            $value = (string)$oldValue;
+                $value = (string) $oldValue;
         }
 
         return $value;
@@ -159,11 +159,11 @@ trait ManagerTraits
 
     public function get($id)
     {
-        if ((int)$id < 1) {
+        if ((int) $id < 1) {
             throw new \Exception('ID必须大于0！');
         }
 
-        return \R::load($this->getTableName(), (int)$id);
+        return \R::load($this->getTableName(), (int) $id);
     }
 
     public function delete($id /*, $options = []*/)
@@ -198,7 +198,7 @@ trait ManagerTraits
             $order = 'desc';
         }
 
-        $limit = (int)$limit;
+        $limit = (int) $limit;
         if ($limit < 1) {
             throw new \Exception('请指定 $limit 参数！');
         }
@@ -209,8 +209,8 @@ trait ManagerTraits
     public function getPaging($page = 1, $limit = 10, $sql = null, $bindings = array())
     {
         $sql   = strtolower($sql);
-        $limit = (int)$limit;
-        $page  = (int)$page;
+        $limit = (int) $limit;
+        $page  = (int) $page;
         if ($limit < 1) {
             throw new \Exception('limit 不允许小于1');
         }
@@ -251,9 +251,8 @@ trait ManagerTraits
 
     /**
      * 返回 $key => $value 形式的数组
-
      *
-*@param $v
+     * @param         $v
      * @param  string $k
      * @return array
      */

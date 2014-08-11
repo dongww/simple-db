@@ -87,7 +87,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 获取树形分类html视图，可指定根节点
      *
-     * @param  int $parent
+     * @param  int    $parent
      * @return string
      */
     public function getTreeView($parent = 0)
@@ -123,8 +123,8 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 在选择的分类下添加子分类，如果未选择父分类，则添加到根
      *
-     * @param  int $parentId
-     * @param $title
+     * @param  int  $parentId
+     * @param       $title
      * @return bool
      */
     public function addChildNode($title, $parentId = 0)
@@ -140,7 +140,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
                 ]
             );
 
-            $child->sort = (int)$maxSort + 1;
+            $child->sort = (int) $maxSort + 1;
 
             $parentName         = static::$tableName;
             $child->$parentName = $parent;
@@ -152,7 +152,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
                 $maxSort     = \R::getCell(
                     sprintf("select max(sort) from %s where %s is null", static::$tableName, static::$parentId)
                 );
-                $child->sort = (int)$maxSort + 1;
+                $child->sort = (int) $maxSort + 1;
             } else {
                 $child->sort = 1;
             }
@@ -334,10 +334,9 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
 
     /**
      * 删除一个分类
-
      *
-*@param $nodeId
-     * @param  array $options
+     * @param            $nodeId
+     * @param  array     $options
      * @return bool|void
      */
     public function delete($nodeId, $options = [])
@@ -370,10 +369,9 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
 
     /**
      * 设置路径和层次
-
      *
-*@param $node
-     * @param  null $parent
+     * @param        $node
+     * @param  null  $parent
      * @return mixed
      */
     public function setPathLevel($node, $parent = null)
@@ -393,7 +391,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     /**
      * 获得排序后的列表
      *
-     * @param  int $pid
+     * @param  int          $pid
      * @return array|string
      */
     public function getSorted($pid = null)
@@ -407,7 +405,7 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
                 if ($row['parent_id'] == $pid) {
                     $result[] = $row;
                     if ($this->hasChildren($row['id'])) {
-                        $result = array_merge($result, (array)$this->getSorted($row['id']));
+                        $result = array_merge($result, (array) $this->getSorted($row['id']));
                     }
                 }
             }
@@ -429,15 +427,15 @@ abstract class TreeCategoryManagerAbstract extends ManagerAbstract
     }
 
     /**
-     * @param       $id
-     * @param  bool $topLevel    是否只获取下一级
-     * @param  bool $includeSelf 是否包含本身
+     * @param             $id
+     * @param  bool       $topLevel    是否只获取下一级
+     * @param  bool       $includeSelf 是否包含本身
      * @return array
      * @throws \Exception
      */
     public function getChildrenIds($id = 0, $topLevel = false, $includeSelf = true)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if ($id < 1) {
             $ids = \R::getCol(
