@@ -35,9 +35,15 @@ class Manager
         }
     }
 
+    /**
+     * @param $name
+     * @return Manager
+     */
     protected function setTableName($name)
     {
         $this->tableName = $name;
+
+        return $this;
     }
 
     /**
@@ -158,6 +164,11 @@ class Manager
         );
     }
 
+    /**
+     * @param $type
+     * @param $oldValue
+     * @return bool|\DateTime|float|int|null|string
+     */
     public function cleanData($type, $oldValue)
     {
         $value = null;

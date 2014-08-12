@@ -105,7 +105,7 @@ trait ManagerTraits
 
             $bean->$f['name'] = $value;
         }
-//print_r($this->getMany2One());exit;
+
         foreach ($this->getMany2One() as $i) {
             $relTable = $i;
             $relKey   = $relTable . '_id';
@@ -114,7 +114,6 @@ trait ManagerTraits
                 continue;
             }
 
-//print_r($data);exit;
             $relId = $data[$relKey];
             if ($relId < 1) {
                 throw new \Exception(sprintf('关联ID %s 必须大于0！', $relKey));
