@@ -10,7 +10,7 @@ namespace Dongww\Db\Doctrine\Dbal\Manager;
 class Bean
 {
     protected $data = [];
-    protected $parents = [];
+    protected $belongTo = [];
     protected $many = [];
     /** @var  Manager */
     protected $manager;
@@ -73,7 +73,7 @@ class Bean
             return $this->data[$name];
         }
 
-        return $this->getParent($name);
+        return $this->getBelongTo($name);
     }
 
     public function import(array $data)
@@ -82,15 +82,15 @@ class Bean
     }
 
     /**
-     * 获得 Parent Bean
+     * 获得 BelongTo Bean
      *
      * @param $name
      * @return Bean|null
      */
-    public function getParent($name)
+    public function getBelongTo($name)
     {
-        $parentId = Manager::foreignKey($name);
-        if (!isset($this->data[$parentId])) {
+        $belongToKey = Manager::foreignKey($name);
+        if (!isset($this->data[$belongToKey])) {
             return null;
         }
 
@@ -99,12 +99,12 @@ class Bean
             if ($tblStructure['tree_able']) {
                 $m = $this->getManager();
 
-                return $m->get($this->data[$parentId]);
+                return $m->get($this->data[$belongToKey]);
             }
         }
 
         $m = $this->getManagerFactory()->getManager($name);
 
-        return $m->get($this->data[$parentId]);
+        return $m->get($this->data[$belongToKey]);
     }
 }

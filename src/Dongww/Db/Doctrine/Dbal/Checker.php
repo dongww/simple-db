@@ -70,10 +70,10 @@ class Checker
         /** 多对一 */
         if (is_array($data['tables'])) {
             foreach ($data['tables'] as $tblName => $tbl) {
-                if (isset($tbl['parents'])) {
-                    foreach ($tbl['parents'] as $p) {
-                        $parentTblName = is_array($p) ? key($p) : $p;
-                        $this->addForeign($tables[$tblName], $tables[$parentTblName]);
+                if (isset($tbl['belong_to'])) {
+                    foreach ($tbl['belong_to'] as $p) {
+                        $belongToTblName = is_array($p) ? key($p) : $p;
+                        $this->addForeign($tables[$tblName], $tables[$belongToTblName]);
                     }
                 }
             }

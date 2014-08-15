@@ -100,8 +100,8 @@ class Manager
             }
         }
 
-        if (isset($tblStructure['parents']) && is_array($tblStructure['parents'])) {
-            foreach ($tblStructure['parents'] as $name) {
+        if (isset($tblStructure['belong_to']) && is_array($tblStructure['belong_to'])) {
+            foreach ($tblStructure['belong_to'] as $name) {
                 $fid        = self::foreignKey($name);
                 $data[$fid] = $bean->get($fid);
                 $types[]    = Type::getType('integer');
