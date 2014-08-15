@@ -7,12 +7,13 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Behavior;
 
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 
 class TreeBehavior implements BehaviorInterface
 {
 
-    public function doIt(Table $table)
+    public function doIt(Table $table, Schema $schema = null)
     {
         $table->addColumn("title", "string", ['notnull' => false]);
         $table->addColumn("sort", "integer", ['notnull' => false]);
