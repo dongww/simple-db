@@ -10,8 +10,10 @@ namespace Dongww\Db\Doctrine\Dbal\Manager;
 class Bean
 {
     protected $data = [];
-    protected $belongTo = [];
-    protected $many = [];
+    protected $tableName;
+    protected $one2Many = [];
+    protected $many2One = [];
+    protected $many2Many = [];
     /** @var  Manager */
     protected $manager;
 
@@ -22,7 +24,62 @@ class Bean
 
     public function getTableName()
     {
-        return $this->manager->getTableName();
+        if (empty($this->tableName)) {
+            $this->tableName = $this->manager->getTableName();
+        }
+
+        return $this->tableName;
+    }
+
+    public function getOne2Many()
+    {
+        $structure = $this->getStructure();
+
+        if (empty($this->one2Many)) {
+            foreach ($structure['tables'] as $tblName => $table) {
+                if (in_array($this->getTableName(), $table['belong_to'])) {
+                    $this->one2Many[] = $tblName;
+                }
+            }
+        }
+
+        return $this->one2Many;
+    }
+
+    public function getMany2Many()
+    {
+        $structure = $this->getStructure();
+
+        if (empty($this->many2Many)) {
+            foreach ($structure['many_many'] as $mm) {
+                if (in_array($this->getTableName(), $mm)) {
+                    $this->many2Many[] = ($mm[0] == $this->getTableName()) ? $mm[1] : $mm[0];
+                }
+            }
+        }
+
+        return $this->many2Many;
+    }
+
+    public function getMany2One()
+    {
+        $structure = $this->getStructure();
+
+        if (empty($this->many2One)) {
+            $this->many2One = $structure['tables'][$this->getTableName()]['belong_to'];
+        }
+
+        return $this->many2One;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getStructure()
+    {
+        return $this->getManagerFactory()
+            ->getStructure()
+            ->getStructure();
     }
 
     /**

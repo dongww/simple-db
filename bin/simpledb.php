@@ -9,7 +9,7 @@ if (file_exists($file = __DIR__ . '/../../../autoload.php') ||
 }
 error_reporting(E_ALL);
 use Symfony\Component\Console\Application;
-use Dongww\Db\Dbal\Command;
+use Dongww\Db\Doctrine\Dbal\Command;
 
 $app = new Application('simple-db', 'v0.0.1');
 $app->add(new Command\UpdateCommand());
