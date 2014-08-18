@@ -84,6 +84,9 @@ class ManagerFactory
         $this->structure = $structure;
     }
 
+    /**
+     * @return Structure
+     */
     public function getStructure()
     {
         return $this->structure;

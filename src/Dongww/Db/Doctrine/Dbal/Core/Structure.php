@@ -19,7 +19,7 @@ class Structure
     const TYPE_DATETIME = 'datetime';
     const TYPE_DATE     = 'date';
     const TYPE_TIME     = 'time';
-    const TYPE_ARRAY     = 'array';
+    const TYPE_ARRAY    = 'array';
 
     /**
      * 可操作的数据类型 => DBAL 的真实类型
@@ -35,7 +35,7 @@ class Structure
         self::TYPE_DATETIME => 'datetime',
         self::TYPE_DATE     => 'date',
         self::TYPE_TIME     => 'time',
-        self::TYPE_ARRAY     => 'array',
+        self::TYPE_ARRAY    => 'array',
     ];
 
     /** @var  array */

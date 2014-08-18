@@ -82,6 +82,8 @@ class Checker
         /** 多对多 */
         if (is_array($data['many_many'])) {
             foreach ($data['many_many'] as $mm) {
+                sort($mm);
+
                 $tblName0 = is_array($mm[0]) ? key($mm[0]) : $mm[0];
                 $tblName1 = is_array($mm[1]) ? key($mm[1]) : $mm[1];
                 $tblName  = $tblName0 . '_' . $tblName1;

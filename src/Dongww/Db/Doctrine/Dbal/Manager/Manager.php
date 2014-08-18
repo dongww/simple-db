@@ -17,6 +17,10 @@ class Manager
     /** @var  ManagerFactory */
     protected $mf;
 
+    protected $one2Many = [];
+    protected $many2One = [];
+    protected $many2Many = [];
+
     /**
      * @return \Doctrine\DBAL\Connection
      */
@@ -256,10 +260,75 @@ class Manager
         return $bean;
     }
 
+    /**
+     * @return array
+     */
+    public function getOne2Many()
+    {
+        $structure = $this->getStructure()->getStructure();
+
+        if (empty($this->one2Many)) {
+            foreach ($structure['tables'] as $tblName => $table) {
+                if (in_array($this->getTableName(), $table['belong_to'])) {
+                    $this->one2Many[] = $tblName;
+                }
+            }
+        }
+
+        return $this->one2Many;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMany2Many()
+    {
+        $structure = $this->getStructure();
+
+        if (empty($this->many2Many)) {
+            foreach ($structure['many_many'] as $mm) {
+                if (in_array($this->getTableName(), $mm)) {
+                    $this->many2Many[] = ($mm[0] == $this->getTableName()) ? $mm[1] : $mm[0];
+                }
+            }
+        }
+
+        return $this->many2Many;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMany2One()
+    {
+        $structure = $this->getStructure();
+
+        if (empty($this->many2One)) {
+            $this->many2One = $structure['tables'][$this->getTableName()]['belong_to'];
+        }
+
+        return $this->many2One;
+    }
+
+    public function getStructure()
+    {
+        return $this->mf->getStructure();
+    }
+
+    /**
+     * @param null $join
+     * @param null $where
+     * @return Bean[]
+     */
     public function select($join = null, $where = null)
     {
         $query = $this->getReader();
-        $data  = $query->select($this->getTableName(), $join, '*', $where);
+        $data  = $query->select(
+            $this->getTableName(),
+            $join,
+            $this->getTableName() . '.*',
+            $where
+        );
 
         $beanArr = [];
 
@@ -267,9 +336,14 @@ class Manager
             $beanArr[] = $this->createBean($row);
         }
 
-        return $this->createBean($data);
+        return $beanArr;
     }
 
+    /**
+     * @param null $join
+     * @param null $where
+     * @return bool
+     */
     public function has($join = null, $where = null)
     {
         $query = $this->getReader();
@@ -278,6 +352,11 @@ class Manager
         return $data;
     }
 
+    /**
+     * @param null $join
+     * @param null $where
+     * @return int
+     */
     public function count($join = null, $where = null)
     {
         $query = $this->getReader();
@@ -286,6 +365,10 @@ class Manager
         return $data;
     }
 
+    /**
+     * @param $sql
+     * @return Bean[]
+     */
     public function query($sql)
     {
         $conn = $this->getConnection();
@@ -300,17 +383,60 @@ class Manager
         return $beanArr;
     }
 
-    public function getSelectQueryBuilder()
+    protected function getSelectQueryBuilder()
     {
         return $this->getConnection()
             ->createQueryBuilder()
             ->from($this->tableName, $this->aliases());
     }
 
-    public function getUpdateQueryBuilder()
+    protected function getUpdateQueryBuilder()
     {
         return $this->getConnection()
             ->createQueryBuilder()
             ->update($this->tableName, $this->aliases());
+    }
+
+    /**
+     * @param      $id
+     * @param      $name
+     * @param null $where
+     * @return array|Bean
+     */
+    public function getMany($id, $name, $where = null)
+    {
+        if (in_array($name, $this->getOne2Many())) {
+            return $this->getManagerFactory()
+                ->getManager($name)
+                ->select(
+                    null,
+                    [
+                        self::foreignKey($this->getTableName()) => $id
+                    ]
+                );
+        } elseif (in_array($name, $this->getMany2Many())) {
+            $mm = [$this->getTableName(), $name];
+            $mm = sort($mm);
+            $mm = $mm[0] . '_' . $mm[1];
+
+            $manager = $this->getManagerFactory()
+                ->getManager($name);
+
+            $foreignKey     = $mm . '.' . self::foreignKey($manager->getTableName());
+            $thisForeignKey = $mm . '.' . self::foreignKey($this->getTableName());
+
+            return $manager->select(
+                [
+                    '[<]' . $mm => [
+                        $manager->getTableName() . '.id' => $foreignKey
+                    ]
+                ],
+                [
+                    $thisForeignKey => $id
+                ]
+            );
+        } else {
+            return [];
+        }
     }
 }
