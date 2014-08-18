@@ -316,8 +316,8 @@ class Manager
     }
 
     /**
-     * @param null $join
-     * @param null $where
+     * @param  null $join
+     * @param  null $where
      * @return Bean[]
      */
     public function select($join = null, $where = null)
@@ -340,8 +340,8 @@ class Manager
     }
 
     /**
-     * @param null $join
-     * @param null $where
+     * @param  null $join
+     * @param  null $where
      * @return bool
      */
     public function has($join = null, $where = null)
@@ -353,8 +353,8 @@ class Manager
     }
 
     /**
-     * @param null $join
-     * @param null $where
+     * @param  null $join
+     * @param  null $where
      * @return int
      */
     public function count($join = null, $where = null)
@@ -398,21 +398,25 @@ class Manager
     }
 
     /**
-     * @param      $id
-     * @param      $name
-     * @param null $where
-     * @return array|Bean
+     * @param               $id
+     * @param               $name
+     * @param  array        $where
+     * @return array|Bean[]
      */
     public function getMany($id, $name, $where = null)
     {
         if (in_array($name, $this->getOne2Many())) {
+            $where = array_merge([
+                    self::foreignKey($this->getTableName()) => $id
+                ],
+                $where
+            );
+
             return $this->getManagerFactory()
                 ->getManager($name)
                 ->select(
                     null,
-                    [
-                        self::foreignKey($this->getTableName()) => $id
-                    ]
+                    $where
                 );
         } elseif (in_array($name, $this->getMany2Many())) {
             $mm = [$this->getTableName(), $name];
@@ -425,15 +429,20 @@ class Manager
             $foreignKey     = $mm . '.' . self::foreignKey($manager->getTableName());
             $thisForeignKey = $mm . '.' . self::foreignKey($this->getTableName());
 
+            $where = array_merge(
+                [
+                    $thisForeignKey => $id
+                ],
+                $where
+            );
+
             return $manager->select(
                 [
                     '[<]' . $mm => [
                         $manager->getTableName() . '.id' => $foreignKey
                     ]
                 ],
-                [
-                    $thisForeignKey => $id
-                ]
+                $where
             );
         } else {
             return [];
