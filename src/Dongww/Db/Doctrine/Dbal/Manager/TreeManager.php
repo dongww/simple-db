@@ -12,6 +12,8 @@ class TreeManager extends Manager
     const INSERT_PREVIOUS = 1;
     const INSERT_NEXT     = 2;
 
+    protected $categories;
+
     public function addChildNode(Bean $bean, Bean $parentBean = null)
     {
         $qb = $this->getSelectQueryBuilder()
@@ -187,7 +189,7 @@ class TreeManager extends Manager
         $path = null;
 
         if ($bean) {
-            $basePath = $bean->path ? $bean->path : '/';
+            $basePath = $bean->path ?: '/';
             $path     = $basePath . $bean->id . '/';
         } else {
             $path = null;
@@ -207,5 +209,50 @@ class TreeManager extends Manager
         }
 
         return $level;
+    }
+
+    protected function reloadCategory()
+    {
+        $qb = $this->getSelectQueryBuilder()
+            ->select($this->allFields());
+
+        $this->categories = $this->getConnection()->fetchAll($qb->getSQL());
+    }
+
+    protected function hasChildren($id)
+    {
+        foreach ($this->categories as $row) {
+            if ($row['parent_id'] == $id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getTreeView($parent = 0)
+    {
+        if (!$this->categories) {
+            $this->reloadCategory();
+        }
+
+        $result = '<ul>';
+        if ($this->categories) {
+            foreach ($this->categories as $row) {
+                if ($row['parent_id'] == $parent) {
+                    $result .= '<li class="jstree-open" id="category_' .
+                        $this->getTableName() . '_' . $row['id'] . '">' . $row['title'];
+                    if ($this->hasChildren($row['id'])) {
+                        $result .= $this->getTreeView($row['id']);
+                    }
+
+                    $result .= "</li>";
+                }
+            }
+        }
+
+        $result .= "</ul>";
+
+        return $result;
     }
 }

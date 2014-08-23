@@ -246,10 +246,8 @@ class Manager
             throw new \Exception('ID必须大于0！');
         }
 
-        $qb = $this->getConnection()->createQueryBuilder();
-        $qb
+        $qb = $this->getSelectQueryBuilder()
             ->select($this->allFields())
-            ->from($this->tableName, $this->aliases())
             ->where($this->idField() . ' = ?')
             ->setMaxResults(1)
             ->setParameter(0, $id);
