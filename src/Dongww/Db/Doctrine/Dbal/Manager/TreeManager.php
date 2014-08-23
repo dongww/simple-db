@@ -39,12 +39,12 @@ class TreeManager extends Manager
 
     public function addPreNode(Bean $insertBean, Bean $currentBean)
     {
-        $this->insertNode($insertBean, $currentBean, self::INSERT_PREVIOUS);
+        return $this->insertNode($insertBean, $currentBean, self::INSERT_PREVIOUS);
     }
 
     public function addNextNode(Bean $insertBean, Bean $currentBean)
     {
-        $this->insertNode($insertBean, $currentBean, self::INSERT_NEXT);
+        return $this->insertNode($insertBean, $currentBean, self::INSERT_NEXT);
     }
 
     public function insertNode(Bean $insertBean, Bean $currentBean, $position = self::INSERT_NEXT)
@@ -214,7 +214,8 @@ class TreeManager extends Manager
     protected function reloadCategory()
     {
         $qb = $this->getSelectQueryBuilder()
-            ->select($this->allFields());
+            ->select($this->allFields())
+            ->orderBy('sort');
 
         $this->categories = $this->getConnection()->fetchAll($qb->getSQL());
     }
