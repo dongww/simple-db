@@ -80,7 +80,7 @@ class Checker
         }
 
         /** 多对多 */
-        if (is_array($data['many_many'])) {
+        if (isset($data['many_many']) && is_array($data['many_many'])) {
             foreach ($data['many_many'] as $mm) {
                 sort($mm);
 
