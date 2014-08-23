@@ -181,7 +181,7 @@ class TreeManager extends Manager
 
         $this->getConnection()->executeUpdate($qb->getSQL(), $qb->getParameters());
 
-        parent::remove($bean);
+        return parent::remove($bean);
     }
 
     protected function getChildPath(Bean $bean = null)
