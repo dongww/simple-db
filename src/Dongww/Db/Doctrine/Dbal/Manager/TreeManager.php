@@ -256,4 +256,42 @@ class TreeManager extends Manager
 
         return $result;
     }
+
+    /**
+     * 获得排序后的列表
+     *
+     * @param  int          $pid
+     * @return array|string
+     */
+    public function getSorted($pid = null)
+    {
+        if (!$this->categories) {
+            $this->reloadCategory();
+        }
+        $result = [];
+        if ($this->categories) {
+            foreach ($this->categories as $row) {
+                if ($row['parent_id'] == $pid) {
+                    $result[] = $row;
+                    if ($this->hasChildren($row['id'])) {
+                        $result = array_merge($result, (array) $this->getSorted($row['id']));
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getCateMap($pre = '--')
+    {
+        $data   = $this->getSorted();
+        $return = [];
+        foreach ($data as $d) {
+            $str              = str_repeat($pre, $d['level'] - 1);
+            $return[$d['id']] = $str . $d['title'];
+        }
+
+        return $return;
+    }
 }
