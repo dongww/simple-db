@@ -112,7 +112,7 @@ class Manager
             }
         }
 
-        if (isset($tblStructure['tree_able']) ? (bool)$tblStructure['tree_able'] : false) {
+        if (isset($tblStructure['tree_able']) ? (bool) $tblStructure['tree_able'] : false) {
             $data['title']     = $bean->title;
             $data['sort']      = $bean->sort;
             $data['path']      = $bean->path;
@@ -127,7 +127,7 @@ class Manager
         }
 
         if ($bean->id) {
-            if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
+            if (isset($tblStructure['timestamp_able']) ? (bool) $tblStructure['timestamp_able'] : false) {
                 $data['updated_at'] = new \DateTime();
                 $types[]            = Type::getType('datetime');
             }
@@ -139,7 +139,7 @@ class Manager
                 $types
             );
         } else { //todo behavior 的插入需要重构，不能写死，须以注册的方式，以便可使用自定义behavior。
-            if (isset($tblStructure['timestamp_able']) ? (bool)$tblStructure['timestamp_able'] : false) {
+            if (isset($tblStructure['timestamp_able']) ? (bool) $tblStructure['timestamp_able'] : false) {
                 $data['created_at'] = new \DateTime();
                 $data['updated_at'] = new \DateTime();
                 $types[]            = Type::getType('datetime');
@@ -183,18 +183,18 @@ class Manager
                 $value = new \DateTime($oldValue);
                 break;
             case Structure::TYPE_INTEGER:
-                $value = (int)trim($oldValue);
+                $value = (int) trim($oldValue);
                 break;
             case Structure::TYPE_FLOAT:
-                $value = (float)trim($oldValue);
+                $value = (float) trim($oldValue);
                 break;
             case Structure::TYPE_BOOLEAN:
-                $value = (bool)$oldValue;
+                $value = (bool) $oldValue;
                 break;
             case Structure::TYPE_STRING:
             case Structure::TYPE_TEXT:
             default:
-                $value = (string)$oldValue;
+                $value = (string) $oldValue;
         }
 
         return $value;
@@ -242,7 +242,7 @@ class Manager
      */
     public function get($id)
     {
-        if ((int)$id < 1) {
+        if ((int) $id < 1) {
             throw new \Exception('ID必须大于0！');
         }
 
@@ -314,8 +314,8 @@ class Manager
     }
 
     /**
-     * @param  null $join
-     * @param  null $where
+     * @param  null   $join
+     * @param  null   $where
      * @return Bean[]
      */
     public function select($join = null, $where = null)
@@ -324,7 +324,7 @@ class Manager
         $data  = $query->select(
             $this->getTableName(),
             $join,
-            $this->getTableName() . '.*',
+            '*',
             $where
         );
 
@@ -361,6 +361,34 @@ class Manager
         $data  = $query->count($this->getTableName(), $join, '*', $where);
 
         return $data;
+    }
+
+    /**
+     * @param  int   $page
+     * @param  int   $limit
+     * @param  array $where
+     * @param  array $join
+     * @return array
+     */
+    public function getPaging($page = 1, $limit = 10, $where = null, $join = null)
+    {
+        $whereArr = [
+            'LIMIT' => [($page - 1) * $limit, $limit],
+        ];
+
+        $whereArr = array_merge($whereArr, $where);
+
+        $beans = $this->select($join, $whereArr);
+        $count = $this->count($join, $where);
+        $pages = ceil($count / $limit);
+
+        return [
+            'data'     => $beans,
+            'count'    => $count,
+            'pages'    => $pages,
+            'is_first' => $page <= 1,
+            'is_last'  => $page >= $pages,
+        ];
     }
 
     /**

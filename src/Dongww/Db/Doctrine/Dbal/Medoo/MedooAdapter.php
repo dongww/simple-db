@@ -13,7 +13,7 @@ class MedooAdapter extends \medoo
 {
     public function __construct(Connection $conn)
     {
-        $this->pdo = $conn->getWrappedConnection();
+        $this->pdo = $conn;
 
         $params   = $conn->getParams();
         $driver   = $params['driver'];
