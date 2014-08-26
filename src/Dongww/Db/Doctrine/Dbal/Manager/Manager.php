@@ -474,4 +474,22 @@ class Manager
             return [];
         }
     }
+
+    /**
+     * 返回 $key => $value 形式的数组
+     *
+     * @param  string $v
+     * @param  string $k
+     * @return array
+     */
+    public function asMap($v, $k = 'id')
+    {
+        $data   = $this->select();
+        $return = [];
+        foreach ($data as $d) {
+            $return[$d->$k] = $d->$v;
+        }
+
+        return $return;
+    }
 }
