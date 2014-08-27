@@ -294,4 +294,5 @@ class TreeManager extends Manager
 
         return $return;
     }
+    //todo 新增编辑移动节点时，以数组形式将路径信息保存到数据库，以便读取。 格式：[['id'=>1, 'title'=>'节点名称'], [...]]
 }

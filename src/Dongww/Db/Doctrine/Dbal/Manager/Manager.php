@@ -492,4 +492,25 @@ class Manager
 
         return $return;
     }
+
+    /**
+     * 获取一部分数据
+     *
+     * @param  string $order
+     * @param  int    $limit
+     * @param  array  $where
+     * @param  array  $join
+     * @return Bean[]
+     */
+    public function getLimit($order, $limit = 10, $where = [], $join = null)
+    {
+        $whereArray = [
+            'ORDER' => $order,
+            'LIMIT' => $limit,
+        ];
+
+        $where = array_merge($whereArray, $where);
+
+        return $this->select($join, $where);
+    }
 }
