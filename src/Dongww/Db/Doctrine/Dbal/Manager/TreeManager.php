@@ -7,6 +7,8 @@
 
 namespace Dongww\Db\Doctrine\Dbal\Manager;
 
+use Doctrine\DBAL\Connection;
+
 class TreeManager extends Manager
 {
     const INSERT_PREVIOUS = 1;
@@ -217,7 +219,7 @@ class TreeManager extends Manager
             ->select($this->allFields())
             ->orderBy('sort');
 
-        $this->categories = $this->getConnection()->fetchAll($qb->getSQL());
+        return $this->categories = $this->getConnection()->fetchAll($qb->getSQL());
     }
 
     protected function hasChildren($id)
@@ -263,7 +265,7 @@ class TreeManager extends Manager
      * @param  int          $pid
      * @return array|string
      */
-    public function getSorted($pid = null)
+    protected function getSorted($pid = null)
     {
         if (!$this->categories) {
             $this->reloadCategory();
@@ -293,6 +295,89 @@ class TreeManager extends Manager
         }
 
         return $return;
+    }
+
+    /**
+     * 获取子节点的id集合
+     *
+     * @param  int   $pid
+     * @param  bool  $topLevel
+     * @param  bool  $includeSelf
+     * @return array
+     */
+    public function getChildrenIds($pid = 0, $topLevel = false, $includeSelf = true)
+    {
+        $id  = (int) $pid;
+        $ids = [];
+
+        if ($id < 1) {
+            $qb = $this->getSelectQueryBuilder()->select('id');
+
+            $data = $this->getConnection()->fetchAll($qb->getSQL());
+            foreach ($data as $d) {
+                $ids[] = (int) $d['id'];
+            }
+
+            return $ids;
+        }
+
+        if ($includeSelf) {
+            $ids[] = $id;
+        }
+
+        if ($topLevel) {
+            $qb = $this->getSelectQueryBuilder()
+                ->select('id')
+                ->where('parent_id = :pid')
+                ->setParameter('pid', $id);
+
+            $data = $this->getConnection()->fetchAll($qb->getSQL(), $qb->getParameters());
+            foreach ($data as $d) {
+                $ids[] = (int) $d['id'];
+            }
+        } else {
+            $qb = $this->getSelectQueryBuilder()
+                ->select('id')
+                ->where('path like :path')
+                ->setParameter('path', '%/' . $id . '/%');
+
+            $data = $this->getConnection()->fetchAll($qb->getSQL(), $qb->getParameters());
+            foreach ($data as $d) {
+                $ids[] = (int) $d['id'];
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * 获得子节点的Bean集合
+     *
+     * @param  int    $pid
+     * @param  bool   $topLevel
+     * @param  bool   $includeSelf
+     * @return Bean[]
+     */
+    public function getChildren($pid = 0, $topLevel = false, $includeSelf = true)
+    {
+        $ids   = $this->getChildrenIds($pid, $topLevel, $includeSelf);
+        $beans = [];
+
+        $qb = $this->getSelectQueryBuilder()
+            ->select('*')
+            ->where('id in (?)');
+
+        $data = $this->getConnection()->fetchAll(
+            $qb->getSQL(),
+            array($ids),
+            array(Connection::PARAM_INT_ARRAY)
+        );
+
+        foreach ($data as $d) {
+            $beans[] = $this->createBean($d);
+        }
+
+        return $beans;
     }
     //todo 新增编辑移动节点时，以数组形式将路径信息保存到数据库，以便读取。 格式：[['id'=>1, 'title'=>'节点名称'], [...]]
 }
