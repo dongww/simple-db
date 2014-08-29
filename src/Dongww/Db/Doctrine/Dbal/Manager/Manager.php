@@ -267,7 +267,7 @@ class Manager
 
         if (empty($this->one2Many)) {
             foreach ($structure['tables'] as $tblName => $table) {
-                if (in_array($this->getTableName(), $table['belong_to'])) {
+                if (in_array($this->getTableName(), (array) $table['belong_to'])) {
                     $this->one2Many[] = $tblName;
                 }
             }
@@ -314,11 +314,11 @@ class Manager
     }
 
     /**
-     * @param  null   $join
-     * @param  null   $where
+     * @param  array  $join
+     * @param  array  $where
      * @return Bean[]
      */
-    public function select($join = null, $where = null)
+    public function select(array $join = [], array $where = [])
     {
         $query = $this->getReader();
         $data  = $query->select(
@@ -338,11 +338,11 @@ class Manager
     }
 
     /**
-     * @param  null $join
-     * @param  null $where
+     * @param  array $join
+     * @param  array $where
      * @return bool
      */
-    public function has($join = null, $where = null)
+    public function has(array $join = [], array $where = [])
     {
         $query = $this->getReader();
         $data  = $query->has($this->getTableName(), $join, $where);
@@ -351,11 +351,11 @@ class Manager
     }
 
     /**
-     * @param  null $join
-     * @param  null $where
+     * @param  array $join
+     * @param  array $where
      * @return int
      */
-    public function count($join = null, $where = null)
+    public function count(array $join = [], array $where = [])
     {
         $query = $this->getReader();
         $data  = $query->count($this->getTableName(), $join, '*', $where);
@@ -370,7 +370,7 @@ class Manager
      * @param  array $join
      * @return array
      */
-    public function getPaging($page = 1, $limit = 10, $where = null, $join = null)
+    public function getPaging($page = 1, $limit = 10, array $where = [], array $join = [])
     {
         $whereArr = [
             'LIMIT' => [($page - 1) * $limit, $limit],
@@ -429,19 +429,19 @@ class Manager
      * @param  array        $where
      * @return array|Bean[]
      */
-    public function getMany($id, $name, $where = null)
+    public function getMany($id, $name, array $where = [])
     {
         if (in_array($name, $this->getOne2Many())) {
             $where = array_merge([
                     self::foreignKey($this->getTableName()) => $id
                 ],
-                $where
+                (array) $where
             );
 
             return $this->getManagerFactory()
                 ->getManager($name)
                 ->select(
-                    null,
+                    [],
                     $where
                 );
         } elseif (in_array($name, $this->getMany2Many())) {
@@ -502,7 +502,7 @@ class Manager
      * @param  array  $join
      * @return Bean[]
      */
-    public function getLimit($order, $limit = 10, $where = [], $join = null)
+    public function getLimit($order, $limit = 10, array $where = [], array $join = [])
     {
         $whereArray = [
             'ORDER' => $order,
