@@ -108,7 +108,7 @@ class Checker
             $foreignTable,
             array($columnName),
             array("id"),
-            array("onUpdate" => "CASCADE")
+            array("onUpdate" => "CASCADE", "onDelete" => "SET NULL")
         );
     }
 }

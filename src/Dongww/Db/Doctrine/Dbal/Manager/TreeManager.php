@@ -155,7 +155,7 @@ class TreeManager extends Manager
     }
 
     public function remove(Bean $bean)
-    {
+    {//todo 可能有点问题，需要进一步测试
         $qb = $this->getSelectQueryBuilder()
             ->select('id')
             ->where('parent_id = :pid')
