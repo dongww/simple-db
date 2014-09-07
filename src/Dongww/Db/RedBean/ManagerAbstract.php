@@ -20,6 +20,8 @@ abstract class ManagerAbstract implements ManagerInterface
 
     public function __construct()
     {
+        require_once __DIR__ . '/rb.php';
+
         if (!static::$tableName) {
             throw new \Exception('未定义表名');
         }
