@@ -15,6 +15,7 @@ tables:
         fields:
             username:
                 type: string
+                unique: true #默认为 false
             password:
                 type: string
     goods:
@@ -24,6 +25,7 @@ tables:
                 required: true
             price:
                 type: float
+                index: true #默认为 false
             weight:
                 type: float
             from:

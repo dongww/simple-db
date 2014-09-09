@@ -43,10 +43,20 @@ class Checker
 
                 foreach ($tbl['fields'] as $fieldName => $field) {
                     $options            = [];
-                    $options['notnull'] = isset($field['required']) ? (bool)$field['required'] : false;
+                    $options['notnull'] = isset($field['required']) ? (bool) $field['required'] : false;
 
                     if (isset($structureMap[$field['type']])) {
                         $newTable->addColumn($fieldName, $structureMap[$field['type']], $options);
+                    } else {
+                        $newTable->addColumn($fieldName, $structureMap['string'], $options);
+                    }
+
+                    if (isset($field['unique']) && (bool) $field['unique']) {
+                        $newTable->addUniqueIndex([$fieldName]);
+                    }
+
+                    if (isset($field['index']) && (bool) $field['index']) {
+                        $newTable->addIndex([$fieldName]);
                     }
                 }
 
