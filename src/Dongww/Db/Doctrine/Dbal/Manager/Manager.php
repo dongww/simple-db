@@ -75,6 +75,15 @@ class Manager
     {
         $bean = new Bean($this);
         if ($data) {
+            $tblStructure = $this->getStructure()
+                ->getTableStructure($this->getTableName());
+
+            if (is_array($tblStructure['fields'])) {
+                foreach ($tblStructure['fields'] as $name => $field) {
+                    $data[$name] = $this->cleanData($field['type'], $data[$name]);
+                }
+            }
+
             $bean->import($data);
         }
 
