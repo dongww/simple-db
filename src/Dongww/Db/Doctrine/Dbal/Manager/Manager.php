@@ -436,9 +436,10 @@ class Manager
      * @param               $id
      * @param               $name
      * @param  array        $where
+     * @param  array        $options
      * @return array|Bean[]
      */
-    public function getMany($id, $name, array $where = [])
+    public function getMany($id, $name, array $where = [], array $options = [])
     {
         if (in_array($name, $this->getOne2Many())) {
             $where = array_merge([
@@ -446,6 +447,13 @@ class Manager
                 ],
                 (array) $where
             );
+
+            if ($options) {
+                $where = array_merge(
+                    ['AND' => $where],
+                    $options
+                );
+            }
 
             return $this->getManagerFactory()
                 ->getManager($name)

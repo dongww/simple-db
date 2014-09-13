@@ -135,8 +135,8 @@ class Bean
         return $m->get($this->data[$belongToKey]);
     }
 
-    public function getMany($name, array $where = [])
+    public function getMany($name, array $where = [], array $options = [])
     {
-        return $this->getManager()->getMany($this->id, $name, $where);
+        return $this->getManager()->getMany($this->id, $name, $where, $options);
     }
 }
